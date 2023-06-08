@@ -21,7 +21,7 @@ export function init(Constants) {
 
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
-        "csmLights.js"
+        "csmLights.js", "popup.js", "slides.js"
     ];
 
     Constants.DefaultCards = [
@@ -60,7 +60,61 @@ export function init(Constants) {
                 dataType: "jpg",
             }
         },
-
+        {
+            card: {
+                translation: [-2, 1, -4],
+                scale: [8, 8, 8],
+                type: "2d",
+                textureType: "image",
+                textureLocation: "./assets/images/Image_1.jpg",
+                behaviorModules: ["PopUpButton"],
+                fullBright: true,
+                cornerRadius: 0.05,
+                depth: 0.05,
+                shadow: true,
+            }
+        },
+        {
+            card: {
+                name: "image card",
+                translation: [-12, -0.4, -10.2],
+                scale: [8, 8, 8],
+                type: "2d",
+                textureType: "image",
+                textureLocation: "./assets/images/Image_3.png",
+                cardURL: "https://croquet.io",
+                cardHilite: 0xffffaa,
+                behaviorModules: ["URLLink"],
+                fullBright: true,
+                frameColor: 0xcccccc,
+                color: 0xbbbbbb,
+                cornerRadius: 0.05,
+                depth: 0.05,
+                height: 2.4,
+                width: 1.8,
+                shadow: true,
+            }
+        },
+        {
+            card: {
+                name: "image card",
+                translation: [12, 0.6, 10.77],
+                rotation: [0, -Math.PI / 2, 0],
+                scale: [4, 4, 4],
+                type: "2d",
+                textureType: "image",
+                textureLocation: "./assets/images/Image_3.png",
+                cardURL: "https://croquet.io",
+                cardHilite: 0xffffaa,
+                behaviorModules: ["URLLink"],
+                fullBright: true,
+                frameColor: 0xcccccc,
+                color: 0xbbbbbb,
+                cornerRadius: 0.05,
+                depth: 0.05,
+                shadow: true,
+            }
+        },
         {
             card: {
                 name: "entrance",
