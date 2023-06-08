@@ -1,4 +1,4 @@
-class PopUpButtonPawn {
+class Shifty4PopUpButtonPawn {
     setup() {
         this.addEventListener("pointerTap", "popUp");
     }
@@ -12,7 +12,7 @@ class PopUpButtonPawn {
         }
 
         this.popupWindow = document.createElement("iframe");
-        this.popupWindow.src = "https://causeverse.io";  // "/assets/test.html";
+        this.popupWindow.src = "/assets/shifty4_popup.html";
 
         this.popupWindow.width = 800;
         this.popupWindow.height = 800;
@@ -31,8 +31,8 @@ class PopUpButtonPawn {
 export default {
     modules: [
         {
-            name: "PopUpButton",
-            pawnBehaviors: [PopUpButtonPawn],
+            name: "Shifty4PopUp",
+            pawnBehaviors: [Shifty4PopUpButtonPawn],
         }
     ]
 }

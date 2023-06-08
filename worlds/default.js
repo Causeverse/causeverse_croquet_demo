@@ -21,22 +21,19 @@ export function init(Constants) {
 
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
-        "csmLights.js", "popup.js", "slides.js"
+        "csmLights.js", "popup.js", "shifty4.js", "slides.js"
     ];
 
     Constants.DefaultCards = [
         {
             card: {
                 name:"world model",
-                
-                
                 placeholder: true,
                 placeholderSize: [400, 0.1, 400],
                 placeholderColor: 0x808080,
                 placeholderOffset: [0, 0, 0],
-
                 translation: [1.070636988005182, -1.5, 10.97875263956077],
-                rotation: [0, -0.9896281675437113, 0, 0.14365267141294777],
+                rotation: [0, -Math.PI, 0],
                 layers: ["pointer", "walk"],
                 name: "/MuseumSpaceExtended.glb",
                 dataLocation: "./assets/3d/MuseumSpaceExtended.glb",
@@ -62,8 +59,9 @@ export function init(Constants) {
         },
         {
             card: {
-                translation: [-2, 1, -4],
-                scale: [8, 8, 8],
+                translation: [35, 0.4, -55],
+                scale: [4, 4, 4],
+                // rotation: [0, -Math.PI / 2, 0],
                 type: "2d",
                 textureType: "image",
                 textureLocation: "./assets/images/Image_1.jpg",
@@ -76,40 +74,57 @@ export function init(Constants) {
         },
         {
             card: {
-                name: "image card",
-                translation: [-12, -0.4, -10.2],
+                translation: [50, 0.3, -20],
                 scale: [8, 8, 8],
                 type: "2d",
                 textureType: "image",
-                textureLocation: "./assets/images/Image_3.png",
+                textureLocation: "./assets/images/Image_2.jpg",
                 cardURL: "https://croquet.io",
-                cardHilite: 0xffffaa,
-                behaviorModules: ["URLLink"],
                 fullBright: true,
-                frameColor: 0xcccccc,
-                color: 0xbbbbbb,
                 cornerRadius: 0.05,
                 depth: 0.05,
-                height: 2.4,
-                width: 1.8,
                 shadow: true,
             }
         },
         {
             card: {
-                name: "image card",
-                translation: [12, 0.6, 10.77],
-                rotation: [0, -Math.PI / 2, 0],
-                scale: [4, 4, 4],
+                translation: [20, 0, -60],
+                scale: [2, 2, 2],
+                rotation: [0, -Math.PI/2*3, 0],
                 type: "2d",
                 textureType: "image",
                 textureLocation: "./assets/images/Image_3.png",
                 cardURL: "https://croquet.io",
-                cardHilite: 0xffffaa,
-                behaviorModules: ["URLLink"],
                 fullBright: true,
-                frameColor: 0xcccccc,
-                color: 0xbbbbbb,
+                cornerRadius: 0.05,
+                shadow: true,
+            }
+        },
+        {
+            card: {
+                translation: [40, 1, -45],
+                scale: [8, 8, 8],
+                // rotation: [0, -Math.PI / 2, 0],
+                type: "2d",
+                textureType: "image",
+                textureLocation: "./assets/images/Image_5.jpg",
+                cardURL: "https://croquet.io",
+                fullBright: true,
+                cornerRadius: 0.05,
+                depth: 0.05,
+                shadow: true,
+            }
+        },
+        {
+            card: {
+                translation: [25, 1, -45],
+                scale: [8, 8, 8],
+                rotation: [0, 0.2, 0],
+                type: "2d",
+                textureType: "image",
+                textureLocation: "./assets/images/Image_7.jpg",
+                behaviorModules: ["Shifty4PopUp"],
+                fullBright: true,
                 cornerRadius: 0.05,
                 depth: 0.05,
                 shadow: true,
