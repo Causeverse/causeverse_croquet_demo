@@ -185,8 +185,9 @@
       }
 
       function navigateToShift4Charge() {
-        var childDiv = document.querySelector(".container");
-        var iframe = childDiv.parentNode;
+        var iframe = window.parent.document.querySelector("#shopping_cart");
+        
+        iframe.style.height = "580px";
 
         var iframeId = iframe.id;
         var iframeClass = iframe.className;
