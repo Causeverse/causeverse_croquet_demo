@@ -21,7 +21,7 @@ export function init(Constants) {
 
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
-        "csmLights.js", "popup.js", "shifty4.js", "slides.js"
+        "shoppingCart.js", "csmLights.js", "popup.js", "shifty4.js", "slides.js"
     ];
 
     Constants.DefaultCards = [
@@ -94,7 +94,7 @@ export function init(Constants) {
                 type: "2d",
                 textureType: "image",
                 textureLocation: "./assets/images/Image_3.png",
-                cardURL: "https://croquet.io",
+                behaviorModules: ["ShoppingCart"],
                 fullBright: true,
                 cornerRadius: 0.05,
                 shadow: true,
