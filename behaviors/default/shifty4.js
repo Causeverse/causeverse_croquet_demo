@@ -12,7 +12,7 @@ class Shifty4PopUpButtonPawn {
         }
 
         this.popupWindow = document.createElement("iframe");
-        this.popupWindow.src = "/assets/shifty4_popup.html";
+        this.popupWindow.src = "/assets/html/shifty4_popup.html";
 
         this.popupWindow.width = 800;
         this.popupWindow.height = 800;

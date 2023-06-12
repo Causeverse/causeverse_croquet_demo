@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <title>Shopping Cart</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f5f5f5;
+      }
+
+      .container input[type="button"] {
+        float: right;
+        width: auto;
+        padding: 10px 20px;
+        border: none;
+        background-color: #f5f5f5;
+        color: #000;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-group input[type="text"],
+      .form-group input[type="number"],
+      .form-group select {
+        width: 95%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      .form-group input[type="button"] {
+        width: auto;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #4caf50;
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .form-group input[type="button"]:hover {
+        background-color: #45a049;
+      }
+
+      .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+      }
+
+      #toast {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: rgb(156, 233, 121);
+        color: rgb(0, 0, 5);
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        top: 30px;
+        font-size: 17px;
+      }
+
+      #toast.show {
+        visibility: visible;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      /* Apply responsive styles */
+      @media screen and (max-width: 600px) {
+        table {
+          font-size: 14px;
+        }
+
+        th,
+        td {
+          padding: 6px;
+        }
+      }
+
+      /* Optional styles for the switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #2196f3;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+      }
+
+      /* Style the switch labels (optional) */
+      .switch-label {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 6px;
+      }
+    </style>
+
+    
+
+    <script>
+      function toastM() {
+        var x = document.getElementById("toast");
+        x.className = "show";
+        setTimeout(function () {
+          x.className = x.className.replace("show", "");
+        }, 3000);
+      }
+
+      function navigateToShift4Charge() {
+        var childDiv = document.querySelector(".container");
+        var iframe = childDiv.parentNode;
+
+        var iframeId = iframe.id;
+        var iframeClass = iframe.className;
+
+        console.log("iFrame ID:", iframeId);
+        console.log("iFrame Class:", iframeClass);
+
+        // Redirect to shifty4_popup.html
+        var total = document.getElementById("totalValue").innerText;
+        console.log("total===", total);
+        var url = "shifty4_popup.html?total=" + total;
+        window.location.href = url;
+      }
+
+      function closePopup() {
+        window.parent.document.querySelector("#shopping_cart").remove();
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div><input type="button" value="X" onclick="closePopup()" /></div>
+      <h2>Shopping Cart</h2>
+      <table id="tblCards">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Amount</th>
+            <th>No / Yes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><img src="../images/Image_1.jpg" style="width: 50px; height: 50px" /></td>
+            <td>10</td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td><img src="../images/Image_2.jpg" style="width: 50px; height: 50px" /></td>
+            <td>20</td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td><img src="../images/Image_9.jpg" style="width: 50px; height: 50px" /></td>
+            <td>30</td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </td>
+          </tr>
+          <tr class="row-visible">
+            <td>Total</td>
+            <td colspan="2" id="totalValue">60</td>
+          </tr>
+          <tr class="row-visible">
+            <td colspan="3">
+              <div class="form-group">
+                <input type="button" value="Buy Now" onclick="navigateToShift4Charge()" />
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <script>
+      var cardsSelected = window.top.cardsSelected || {};
+      console.log(cardsSelected);
+      $(document).ready(function () {
+        $(`#tblCards tbody tr:not(.row-visible)`).remove();
+
+        let total = 0;
+        let str = Object.values(cardsSelected).reduce((acc, cur) => {
+          total += Number(cur.price);
+          let strItem = `<tr>
+        <td><img src="${cur.textureLocation.replace("./assets/", "../")}" style="width: 50px; height: 50px;"/></td>
+        <td>${cur.price}</td>
+        <td>
+          <label class="switch">
+            <input type="checkbox" checked onchange="onItemChange(event,${cur.price})">
+            <span class="slider"></span>
+          </label>
+        </td>
+      </tr>`;
+          return acc + strItem;
+        }, "");
+        $("#totalValue").html(total);
+        $(`.row-visible:first`).before(str);
+      });
+
+      function onItemChange(e, price) {
+        price = Number(price)
+        const total = Number($("#totalValue").text());
+        const dom = (e.target || e.currentTarget);
+        $("#totalValue").html(total + (dom.checked ? 1 : -1) * price);
+      }
+    </script>
+  </body>
+</html>
