@@ -78,7 +78,7 @@ export function init(Constants) {
         rotation: [0, (-Math.PI / 2) * 3, 0],
         type: "2d",
         textureType: "image",
-        textureLocation: "./assets/images/Image_3.png",
+        textureLocation: "./assets/images/Image_10.jpg",
         behaviorModules: ["PriceCard", "ShoppingCart"],
         fullBright: true,
         cornerRadius: 0.05,
