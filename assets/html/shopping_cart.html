@@ -173,8 +173,6 @@
       }
     </style>
 
-    
-
     <script>
       function toastM() {
         var x = document.getElementById("toast");
@@ -186,7 +184,7 @@
 
       function navigateToShift4Charge() {
         var iframe = window.parent.document.querySelector("#shopping_cart");
-        
+
         iframe.style.height = "580px";
 
         var iframeId = iframe.id;
@@ -265,34 +263,67 @@
       </table>
     </div>
     <script>
-      var cardsSelected = window.top.cardsSelected || {};
-      console.log(cardsSelected);
-      $(document).ready(function () {
+      const iframe = window.parent.document.querySelector('#shopping_cart');
+      var cardsSelected = {};
+      var xpos = 0;
+      $(document).ready(updateTable);
+
+      window.addEventListener("message", (evt) => {
+        console.log("shopping_cart : message", evt.data);
+
+        if (evt.data.message == "select-card") {
+          if (!cardsSelected[evt.data.card.id]) {
+            cardsSelected[evt.data.card.id] = evt.data.card._cardData;
+          } else {
+            delete cardsSelected[evt.data.card.id];
+          }
+          updateTable();
+        }  else if(evt.data.message == "moveWindow"){
+          moveWindow();
+        }
+      });
+
+      // const channel = new BroadcastChannel("example-channel");
+      // channel.addEventListener("message", (evt) => {
+      //   if(evt.data.message == "current-xpos"){
+      //     xpos = evt.data.xpos;
+      //   }
+      // });
+
+      function moveWindow(){
+        iframe.style.left = (Math.min(window.parent.innerWidth - 400, Math.max(20, window.parent.xpos - 200))) + "px";
+      }
+
+
+      function updateTable() {
+        const cardCount = Object.keys(cardsSelected).length;
+        iframe.style.height = 235 + 66 * cardCount + "px";
+
         $(`#tblCards tbody tr:not(.row-visible)`).remove();
 
         let total = 0;
         let str = Object.values(cardsSelected).reduce((acc, cur) => {
           total += Number(cur.price);
           let strItem = `<tr>
-        <td><img src="${cur.textureLocation.replace("./assets/", "../")}" style="width: 50px; height: 50px;"/></td>
-        <td>${cur.price}</td>
-        <td>
-          <label class="switch">
-            <input type="checkbox" checked onchange="onItemChange(event,${cur.price})">
-            <span class="slider"></span>
-          </label>
-        </td>
-      </tr>`;
+                          <td><img src="${cur.textureLocation.replace("./assets/", "../")}" style="width: 50px; height: 50px;"/></td>
+                          <td>${cur.price}</td>
+                          <td>
+                            <label class="switch">
+                              <input type="checkbox" checked onchange="onItemChange(event,${cur.price})">
+                              <span class="slider"></span>
+                            </label>
+                          </td>
+                        </tr>`;
           return acc + strItem;
         }, "");
         $("#totalValue").html(total);
         $(`.row-visible:first`).before(str);
-      });
+      }
 
       function onItemChange(e, price) {
-        price = Number(price)
+        price = Number(price);
         const total = Number($("#totalValue").text());
-        const dom = (e.target || e.currentTarget);
+        const dom = e.target || e.currentTarget;
         $("#totalValue").html(total + (dom.checked ? 1 : -1) * price);
       }
     </script>

@@ -8,8 +8,11 @@
   <link id="microverse-css" rel="stylesheet" href="./assets/css/microverse.css" />
   <link href="./assets/fonts/css/all.min.css" rel="stylesheet">
   <script>
-    document.addEventListener('mousemove', function(event) {
-    window.top.mousePosition = [event.pageX, event.pageY];
+    var xpos = 0;
+    document.addEventListener('mousedown', function(event) {
+      const channel = new BroadcastChannel("example-channel");
+      channel.postMessage({message: "current-xpos", xpos: event.pageX});
+      xpos = event.pageX;
 });
   </script>
 <script defer src="lib/index-3bf63c4f.js"></script></head>

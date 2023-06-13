@@ -160,6 +160,9 @@
         }, 3000);
       }
       function validateForm() {
+
+        console.log("shifty4_popup.html window = ", window);
+
         const BACKEND_API = "6a3abeb3-bde5-45bf-85ce-c6cadcbb67b8";
         const BACKEND_URL = "https://api.8base.com/clirdmoaa000d08l28ill17m9";
         const SHIFT4_PUBLIC_KEY = "pk_test_jcMLbiXi9FymReWolTm8pggJ";
@@ -212,6 +215,7 @@
                 .then((res) => {
                   console.log("result = ", res.data.result);
                   bResult = res.data.result;
+                  toastM();
                 });
             })
             .catch((err) => console.log(err));
