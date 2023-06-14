@@ -5,228 +5,11 @@
     <!--TODO : Replace client ID-->
     <script src="https://www.paypal.com/sdk/js?client-id=AXQqUwacqb5esrKllRvQOZucAfYyVHdKMKwrT6qx0fIH9WN0abLD_jan5-ptZ3mMv0gCwsS9nE4E5wh5&currency=USD"></script>
     <title>Shopping Cart</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
+	    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
+	 <link rel="stylesheet" href="../css/shifty4_popup.css" />
 
-      .container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f5f5f5;
-      }
-
-      .container input[type="button"] {
-        float: right;
-        width: auto;
-        padding: 10px 20px;
-        border: none;
-        background-color: #f5f5f5;
-        color: #000;
-        cursor: pointer;
-        font-size: 16px;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-      }
-
-      .form-group input[type="text"],
-      .form-group input[type="number"],
-      .form-group select {
-        width: 95%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 14px;
-      }
-
-      .form-group input[type="button"] {
-        width: auto;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        background-color: #4caf50;
-        color: #fff;
-        cursor: pointer;
-        font-size: 16px;
-      }
-
-      .form-group input[type="button"]:hover {
-        background-color: #45a049;
-      }
-
-      .form-group input[type="button"]:disabled {
-        background-color: #ccc;
-        pointer-events: none;
-      }
-
-      .error-message {
-        color: red;
-        font-size: 12px;
-        margin-top: 5px;
-      }
-
-      #toast {
-        visibility: hidden;
-        min-width: 250px;
-        margin-left: -125px;
-        background-color: rgb(156, 233, 121);
-        color: rgb(0, 0, 5);
-        text-align: center;
-        border-radius: 2px;
-        padding: 16px;
-        position: fixed;
-        z-index: 1;
-        left: 50%;
-        top: 30px;
-        font-size: 17px;
-      }
-
-      #toast.show {
-        visibility: visible;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th,
-      td {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
-
-      /* Apply responsive styles */
-      @media screen and (max-width: 600px) {
-        table {
-          font-size: 14px;
-        }
-
-        th,
-        td {
-          padding: 6px;
-        }
-      }
-
-      /* Optional styles for the switch */
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-      }
-
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-      }
-
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-      }
-
-      input:checked + .slider {
-        background-color: #2196f3;
-      }
-
-      input:focus + .slider {
-        box-shadow: 0 0 1px #2196f3;
-      }
-
-      input:checked + .slider:before {
-        -webkit-transform: translateX(26px);
-        -ms-transform: translateX(26px);
-        transform: translateX(26px);
-      }
-
-      /* Style the switch labels (optional) */
-      .switch-label {
-        display: inline-block;
-        vertical-align: middle;
-        margin-left: 6px;
-      }
-      .row-payment input[type="radio"] {
-        margin: 0;
-        padding: 0;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-      }
-
-      .creditcard {
-        background-image: url("../images/credit.png");
-      }
-
-      .paypal {
-        background-image: url("../images/paypal.png");
-      }
-
-      .venmo {
-        background-image: url("../images/venmo.png");
-      }
-
-      .row-payment input[type="radio"]:active + .drinkcard-cc {
-        opacity: 0.9;
-      }
-      .row-payment input[type="radio"]:checked + .drinkcard-cc {
-        -webkit-filter: none;
-        -moz-filter: none;
-        filter: none;
-      }
-
-      .drinkcard-cc {
-        cursor: pointer;
-        background-size: contain;
-        background-repeat: no-repeat;
-        display: inline-block;
-        width: 100px;
-        height: 30px;
-        -webkit-transition: all 100ms ease-in;
-        -moz-transition: all 100ms ease-in;
-        transition: all 100ms ease-in;
-        -webkit-filter: brightness(1.8) grayscale(1) opacity(0.7);
-        -moz-filter: brightness(1.8) grayscale(1) opacity(0.7);
-        filter: brightness(1.8) grayscale(1) opacity(0.7);
-      }
-      .drinkcard-cc:hover {
-        -webkit-filter: brightness(1.2) grayscale(0.5) opacity(0.9);
-        -moz-filter: brightness(1.2) grayscale(0.5) opacity(0.9);
-        filter: brightness(1.2) grayscale(0.5) opacity(0.9);
-      }
-    </style>
 
     <script>
       function toastM() {
@@ -244,8 +27,8 @@
 
         // Redirect to shifty4_popup.html
         var total = document.getElementById("totalValue").innerText;
-        console.log("total===", total);
-        var url = "payment.html?total=" + total;
+        
+        var url = "shifty4_popup.html?total=" + total;
         window.location.href = url;
       }
 
@@ -315,7 +98,7 @@
       });
     </script>
   </head>
-  <body style="overflow: hidden">
+  <body>
     <div class="container">
       <div><input type="button" value="X" onclick="closePopup()" /></div>
       <h2>Shopping Cart</h2>
@@ -358,9 +141,10 @@
               </label>
             </td>
           </tr>
-          <tr class="row-visible">
+          <tr class="row-visible" style="font-weight: bolder">
             <td>Total</td>
-            <td colspan="2" id="totalValue">60</td>
+                        <td id="totalValue">60</td>
+            <td></td>
           </tr>
           <tr class="row-payment">
             <td>
@@ -393,6 +177,7 @@
       const iframe = window.parent.document.querySelector("#shopping_cart");
       var cardsSelected = {};
       var xpos = 0;
+      const CURRENCY = "$";
       $(document).ready(updateTable);
 
       window.addEventListener("message", (evt) => {
@@ -409,12 +194,13 @@
       });
 
       function moveWindow() {
-        iframe.style.left = Math.min(window.parent.innerWidth - 400, Math.max(20, window.parent.xpos - 200)) + "px";
+        $(iframe).animate({ left: Math.min(window.parent.innerWidth - 400, Math.max(20, window.parent.xpos - 200)) + "px" }, 200);
+        
       }
 
       function updateTable() {
         const cardCount = Object.keys(cardsSelected).length;
-        iframe.style.height = 300 + 66 * cardCount + "px";
+        iframe.style.height = 300 + 73 * cardCount + "px";
 
         $(`#tblCards tbody tr:not(.row-visible,.row-payment)`).remove();
 
@@ -423,7 +209,7 @@
           total += Number(cur.price);
           let strItem = `<tr>
                           <td><img src="${cur.textureLocation.replace("./assets/", "../")}" style="width: 50px; height: 50px;"/></td>
-                          <td>${cur.price}</td>
+                          <td>${Number(cur.price).toFixed(2)}${CURRENCY}</td>
                           <td>
                             <label class="switch">
                               <input type="checkbox" checked onchange="onItemChange(event,${cur.price})">
@@ -433,19 +219,20 @@
                         </tr>`;
           return acc + strItem;
         }, "");
-        $("#totalValue").html(total);
+        $("#totalValue").html(total.toFixed(2) + CURRENCY);
         $(`.row-visible:first`).before(str);
         createPaypalButtons(total);
       }
 
       function onItemChange(e, price) {
-        price = Number(price);
-        const total = Number($("#totalValue").text());
+        let totalstr = $("#totalValue").text();
+        totalstr = totalstr.substring(0, totalstr.length - 1);
+        let total = Number(totalstr);
         const dom = e.target || e.currentTarget;
-        const newPrice = total + (dom.checked ? 1 : -1) * price;
-        $("#totalValue").html(newPrice);
+        total = total + (dom.checked ? 1 : -1) * Number(price);
+        $("#totalValue").html(total.toFixed(2) + CURRENCY);
 
-        createPaypalButtons(newPrice);
+        createPaypalButtons(total);
       }
 
     </script>

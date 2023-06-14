@@ -3,7 +3,7 @@
 // info@croquet.io
 
 export function init(Constants) {
-  Constants.AvatarNames = ["newwhite"];
+  Constants.AvatarNames = ["causeverse"];
 
   /* Alternatively, you can specify a card spec for an avatar,
        instead of a string for the partical file name, to create your own avatar.
@@ -68,7 +68,7 @@ export function init(Constants) {
         cornerRadius: 0.05,
         depth: 0.05,
         shadow: true,
-        price: "30",
+        price: "25.99",
       },
     },
     {
@@ -83,7 +83,7 @@ export function init(Constants) {
         fullBright: true,
         cornerRadius: 0.05,
         shadow: true,
-        price: "50",
+        price: "42.5",
       },
     },
     {
@@ -117,7 +117,7 @@ export function init(Constants) {
         cornerRadius: 0.05,
         depth: 0.05,
         shadow: true,
-        price: "20",
+        price: "18.6",
       },
     },
     {

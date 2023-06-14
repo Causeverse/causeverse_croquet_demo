@@ -2,134 +2,20 @@
 <html>
   <head>
     <title>Shifty4 Credit Card Form</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-
-      .container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f5f5f5;
-      }
-
-      .container input[type="button"] {
-        float: right;
-        width: auto;
-        padding: 10px 20px;
-        border: none;
-        background-color: #f5f5f5;
-        color: #000;
-        cursor: pointer;
-        font-size: 16px;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-      }
-
-      .row {
-        display: flex;
-        flex-direction: row;
-        margin-bottom: 25px;
-      }
-
-      .row label {
-        font-weight: bold;
-        margin-right: 20px;
-      }
-
-      .row div {
-        font-weight: 700;
-      }
-
-      .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-      }
-
-      .form-group input[type="text"],
-      .form-group input[type="number"],
-      .form-group select {
-        width: 95%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 14px;
-      }
-
-      .form-group input[type="submit"] {
-        width: auto;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        background-color: #4caf50;
-        color: #fff;
-        cursor: pointer;
-        font-size: 16px;
-      }
-
-      .form-group input[type="submit"]:hover {
-        background-color: #45a049;
-      }
-
-      .error-message {
-        color: red;
-        font-size: 12px;
-        margin-top: 5px;
-      }
-
-      #toast {
-        visibility: hidden;
-        min-width: 250px;
-        margin-left: -125px;
-        background-color: rgb(156, 233, 121);
-        color: rgb(0, 0, 5);
-        text-align: center;
-        border-radius: 2px;
-        padding: 16px;
-        position: fixed;
-        z-index: 1;
-        left: 50%;
-        top: 30px;
-        font-size: 17px;
-      }
-
-      #toast.show {
-        visibility: visible;
-        /* -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-        animation: fadein 0.5s, fadeout 0.5s 2.5s; */
-      }
-
-      /* @-webkit-keyframes fadein {
-        from {bottom: 0; opacity: 0;} 
-        to {bottom: 30px; opacity: 1;}
-    }
-
-    @keyframes fadein {
-        from {bottom: 0; opacity: 0;}
-        to {bottom: 30px; opacity: 1;}
-    }
-
-    @-webkit-keyframes fadeout {
-        from {bottom: 30px; opacity: 1;} 
-        to {bottom: 0; opacity: 0;}
-    }
-
-    @keyframes fadeout {
-        from {bottom: 30px; opacity: 1;}
-        to {bottom: 0; opacity: 0;}
-    } */
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/shifty4_popup.css" />
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://js.dev.shift4.com/shift4.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <script type="text/javascript" src="https://js.dev.shift4.com/shift4.js" defer></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js" defer></script>
 
     <script>
+      var totalValue = 0;
+      var currency_symbol = "$";
+      var currency = "USD";
+
+
       function getParameterValue(parameterName) {
         var urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(parameterName);
@@ -137,13 +23,16 @@
 
       function init() {
         // Get the total value from the URL parameter
-        var total = getParameterValue("total");
+        const total = getParameterValue("total");
+        totalValue = Number(total.substring(0, total.length - 1));
+        currency_symbol = total.substring(total.length - 1);
 
         // Set the total value in the div
         var amountDiv = document.getElementById("amount");
 
         if (amountDiv) {
           amountDiv.innerHTML = total;
+          $('#card-info').submit(() => {return validateForm()})
         } else {
           console.error("Element with ID 'amount' not found.");
         }
@@ -153,55 +42,13 @@
     </script>
 
     <script>
-      function toastM(success, strMsg) {
+      function toastM() {
         var x = document.getElementById("toast");
         x.className = "show";
-        x.value = strMsg + " " + success ? "Success!" : "Failed.";
         setTimeout(function () {
           x.className = x.className.replace("show", "");
         }, 3000);
       }
-
-      // async function creditCardPayment(amount, cardNumber, expMonth, expYear, cardCVV, cardHolder) {
-
-      //   console.log("creditCardPayment")
-      //   axios.post(
-      //       SHIFT4_URL,
-      //       {
-      //         number: cardNumber,
-      //         expMonth: expMonth,
-      //         expYear: expYear,
-      //         cvc: cardCVV,
-      //         cardholderName: cardHolder,
-      //       },
-      //       {
-      //         headers: {
-      //           "Access-Control-Allow-Origin": "*",
-      //           "Content-Type": "application/json",
-      //         },
-      //         auth: {
-      //           username: SHIFT4_PUBLIC_KEY,
-      //           password: "",
-      //         },
-      //       }
-      //     )
-      //     .then((res) => {res.data.id})
-      //     .then((token) => {
-      //       const url = BACKEND_URL + "/webhook/payment-shifty";
-      //       console.log("creditCardPayment : token = ", token)
-      //       axios
-      //         .post(url, {
-      //           tokenId: token,
-      //           priceAmount: amount,
-      //         })
-      //         .then((res) => {
-      //           console.log("result = ", res.data.result);
-      //           toastM(res.data.result, "Credit Card Charge");
-      //         });
-      //     })
-      //     .catch((err) => console.log(err));
-      // }
-
       function validateForm() {
         startLoading();
 
@@ -209,6 +56,7 @@
         const BACKEND_URL = "https://api.8base.com/clirdmoaa000d08l28ill17m9";
         const SHIFT4_PUBLIC_KEY = "pk_test_jcMLbiXi9FymReWolTm8pggJ";
         const SHIFT4_URL = "https://api.shift4.com/tokens";
+        let bResult = false;
 
         const validAmount = validateAmount();
         const validCardNumber = validateCardNumber();
@@ -217,12 +65,12 @@
         const validCVV = validateCVV();
 
         if (validAmount && validCardNumber && validCardholderName && validExpiryDate && validCVV) {
-          const amount = document.getElementById("amount").textContent;
+          
           const cardNumber = document.getElementById("card-number").value.trim();
           const cardExpire = document.getElementById("expiry-date").value.trim();
           const expMonth = cardExpire.substring(0, cardExpire.indexOf("/"));
           const expYear = cardExpire.substring(cardExpire.indexOf("/") + 1);
-          const cardCVC = document.getElementById("cvv").value.trim();
+          const cardCvc = document.getElementById("cvv").value.trim();
           const cardholderName = document.getElementById("cardholder-name").value.trim();
 
           axios
@@ -232,7 +80,7 @@
                 number: cardNumber,
                 expMonth: expMonth,
                 expYear: expYear,
-                cvc: cardCVC,
+                cvc: cardCvc,
                 cardholderName: cardholderName,
               },
               {
@@ -248,17 +96,17 @@
             )
             .then((res) => res.data.id)
             .then((token) => {
-              console.log("token = ", token);
               const url = BACKEND_URL + "/webhook/payment-shifty";
 
               axios
                 .post(url, {
                   tokenId: token,
-                  priceAmount: amount,
+                  priceAmount: totalValue,
                 })
                 .then((res) => {
                   stopLoading();
-                  toastM(res.data.result, "Credit Card Charge");
+                  bResult = res.data.result;
+                  if (bResult) toastM();
                 });
             })
             .catch((err) => {
@@ -266,7 +114,7 @@
               console.log(err);
             });
         }
-        return false;
+        return bResult;
       }
 
       function setError(inputElement, message) {
@@ -409,7 +257,7 @@
     <div class="container">
       <div><input type="button" value="X" onclick="closePopup()" /></div>
       <h2>Shift4 Credit Card Information</h2>
-      <form onsubmit="return validateForm()">
+      <form id="card-info">
         <div class="row">
           <label>Amount:</label>
           <div id="amount"></div>
@@ -442,8 +290,7 @@
       </form>
       <div id="toast">Shift4 Charge Success!</div>
     </div>
-
-    <div id="loader" style="pointer-events: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; backdrop-filter: blur(0.5rem); z-index: 9999999">
+    <div id="loader" style="pointer-events: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; backdrop-filter: blur(0.5rem); z-index: 9999999; display: none">
       <div
         style="
           background-image: url(../images/loading.gif);
@@ -451,13 +298,12 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          width: 200px;
-          height: 200px;
+          width: 100px;
+          height: 100px;
           background-size: cover;
           background-position: center;
           border-radius: 1000vh;
-          border: 2rem solid black;
-          box-shadow: 0 0 10rem blue;
+          box-shadow: 0 0 10rem white;
         "
       ></div>
     </div>
