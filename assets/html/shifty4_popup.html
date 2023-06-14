@@ -125,6 +125,7 @@
         to {bottom: 0; opacity: 0;}
     } */
     </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://js.dev.shift4.com/shift4.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
@@ -160,8 +161,7 @@
         }, 3000);
       }
       function validateForm() {
-
-        console.log("shifty4_popup.html window = ", window);
+        startLoading();
 
         const BACKEND_API = "6a3abeb3-bde5-45bf-85ce-c6cadcbb67b8";
         const BACKEND_URL = "https://api.8base.com/clirdmoaa000d08l28ill17m9";
@@ -184,7 +184,8 @@
           const cardCvc = document.getElementById("cvv").value.trim();
           const cardholderName = document.getElementById("cardholder-name").value.trim();
 
-          axios.post(
+          axios
+            .post(
               SHIFT4_URL,
               {
                 number: cardNumber,
@@ -208,17 +209,21 @@
             .then((token) => {
               const url = BACKEND_URL + "/webhook/payment-shifty";
 
-              axios.post(url, {
+              axios
+                .post(url, {
                   tokenId: token,
-                  priceAmount : amount
+                  priceAmount: amount,
                 })
                 .then((res) => {
-                  console.log("result = ", res.data.result);
+                  stopLoading();
                   bResult = res.data.result;
                   if (bResult) toastM();
                 });
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+              stopLoading();
+              console.log(err);
+            });
         }
         return bResult;
       }
@@ -396,5 +401,33 @@
       </form>
       <div id="toast">Shift4 Charge Success!</div>
     </div>
+    <div id="loader" style="pointer-events: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; backdrop-filter: blur(0.5rem); z-index: 9999999; display: none;">
+      <div
+        style="
+          background-image: url(../images/loading.gif);
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100px;
+          height: 100px;
+          background-size: cover;
+          background-position: center;
+          border-radius: 1000vh;
+          box-shadow: 0 0 10rem white;
+        "
+      ></div>
+    </div>
+    <script>
+      function startLoading() {
+        $(window.parent.document.body).css("pointer-events", "none");
+        $("#loader").show();
+      }
+      function stopLoading() {
+        $(window.parent.document.body).css("pointer-events", "unset");
+        $("#loader").hide();
+      }
+      stopLoading();
+    </script>
   </body>
 </html>
