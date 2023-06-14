@@ -206,7 +206,7 @@
             )
             .then((res) => res.data.id)
             .then((token) => {
-              const url = BACKEND_URL + "/webhook/payment-test";
+              const url = BACKEND_URL + "/webhook/payment-shifty";
 
               axios.post(url, {
                   tokenId: token,
@@ -215,7 +215,7 @@
                 .then((res) => {
                   console.log("result = ", res.data.result);
                   bResult = res.data.result;
-                  toastM();
+                  if (bResult) toastM();
                 });
             })
             .catch((err) => console.log(err));
