@@ -125,6 +125,7 @@
         to {bottom: 0; opacity: 0;}
     } */
     </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://js.dev.shift4.com/shift4.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 
@@ -152,22 +153,62 @@
     </script>
 
     <script>
-      function toastM() {
+      function toastM(success, strMsg) {
         var x = document.getElementById("toast");
         x.className = "show";
+        x.value = strMsg + " " + success ? "Success!" : "Failed.";
         setTimeout(function () {
           x.className = x.className.replace("show", "");
         }, 3000);
       }
-      function validateForm() {
 
-        console.log("shifty4_popup.html window = ", window);
+      // async function creditCardPayment(amount, cardNumber, expMonth, expYear, cardCVV, cardHolder) {
+
+      //   console.log("creditCardPayment")
+      //   axios.post(
+      //       SHIFT4_URL,
+      //       {
+      //         number: cardNumber,
+      //         expMonth: expMonth,
+      //         expYear: expYear,
+      //         cvc: cardCVV,
+      //         cardholderName: cardHolder,
+      //       },
+      //       {
+      //         headers: {
+      //           "Access-Control-Allow-Origin": "*",
+      //           "Content-Type": "application/json",
+      //         },
+      //         auth: {
+      //           username: SHIFT4_PUBLIC_KEY,
+      //           password: "",
+      //         },
+      //       }
+      //     )
+      //     .then((res) => {res.data.id})
+      //     .then((token) => {
+      //       const url = BACKEND_URL + "/webhook/payment-shifty";
+      //       console.log("creditCardPayment : token = ", token)
+      //       axios
+      //         .post(url, {
+      //           tokenId: token,
+      //           priceAmount: amount,
+      //         })
+      //         .then((res) => {
+      //           console.log("result = ", res.data.result);
+      //           toastM(res.data.result, "Credit Card Charge");
+      //         });
+      //     })
+      //     .catch((err) => console.log(err));
+      // }
+
+      function validateForm() {
+        startLoading();
 
         const BACKEND_API = "6a3abeb3-bde5-45bf-85ce-c6cadcbb67b8";
         const BACKEND_URL = "https://api.8base.com/clirdmoaa000d08l28ill17m9";
         const SHIFT4_PUBLIC_KEY = "pk_test_jcMLbiXi9FymReWolTm8pggJ";
         const SHIFT4_URL = "https://api.shift4.com/tokens";
-        let bResult = false;
 
         const validAmount = validateAmount();
         const validCardNumber = validateCardNumber();
@@ -181,16 +222,17 @@
           const cardExpire = document.getElementById("expiry-date").value.trim();
           const expMonth = cardExpire.substring(0, cardExpire.indexOf("/"));
           const expYear = cardExpire.substring(cardExpire.indexOf("/") + 1);
-          const cardCvc = document.getElementById("cvv").value.trim();
+          const cardCVC = document.getElementById("cvv").value.trim();
           const cardholderName = document.getElementById("cardholder-name").value.trim();
 
-          axios.post(
+          axios
+            .post(
               SHIFT4_URL,
               {
                 number: cardNumber,
                 expMonth: expMonth,
                 expYear: expYear,
-                cvc: cardCvc,
+                cvc: cardCVC,
                 cardholderName: cardholderName,
               },
               {
@@ -206,21 +248,25 @@
             )
             .then((res) => res.data.id)
             .then((token) => {
-              const url = BACKEND_URL + "/webhook/payment-test";
+              console.log("token = ", token);
+              const url = BACKEND_URL + "/webhook/payment-shifty";
 
-              axios.post(url, {
+              axios
+                .post(url, {
                   tokenId: token,
-                  priceAmount : amount
+                  priceAmount: amount,
                 })
                 .then((res) => {
-                  console.log("result = ", res.data.result);
-                  bResult = res.data.result;
-                  toastM();
+                  stopLoading();
+                  toastM(res.data.result, "Credit Card Charge");
                 });
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+              stopLoading();
+              console.log(err);
+            });
         }
-        return bResult;
+        return false;
       }
 
       function setError(inputElement, message) {
@@ -396,5 +442,35 @@
       </form>
       <div id="toast">Shift4 Charge Success!</div>
     </div>
+
+    <div id="loader" style="pointer-events: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; backdrop-filter: blur(0.5rem); z-index: 9999999">
+      <div
+        style="
+          background-image: url(../images/loading.gif);
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 200px;
+          height: 200px;
+          background-size: cover;
+          background-position: center;
+          border-radius: 1000vh;
+          border: 2rem solid black;
+          box-shadow: 0 0 10rem blue;
+        "
+      ></div>
+    </div>
+    <script>
+      function startLoading() {
+        $(window.parent.document.body).css("pointer-events", "none");
+        $("#loader").show();
+      }
+      function stopLoading() {
+        $(window.parent.document.body).css("pointer-events", "unset");
+        $("#loader").hide();
+      }
+      stopLoading();
+    </script>
   </body>
 </html>

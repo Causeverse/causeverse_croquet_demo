@@ -2,6 +2,8 @@
 <html>
   <head>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <!--TODO : Replace client ID-->
+    <script src="https://www.paypal.com/sdk/js?client-id=AXQqUwacqb5esrKllRvQOZucAfYyVHdKMKwrT6qx0fIH9WN0abLD_jan5-ptZ3mMv0gCwsS9nE4E5wh5&currency=USD"></script>
     <title>Shopping Cart</title>
     <style>
       body {
@@ -61,6 +63,11 @@
 
       .form-group input[type="button"]:hover {
         background-color: #45a049;
+      }
+
+      .form-group input[type="button"]:disabled {
+        background-color: #ccc;
+        pointer-events: none;
       }
 
       .error-message {
@@ -171,6 +178,54 @@
         vertical-align: middle;
         margin-left: 6px;
       }
+      .row-payment input[type="radio"] {
+        margin: 0;
+        padding: 0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+
+      .creditcard {
+        background-image: url("../images/credit.png");
+      }
+
+      .paypal {
+        background-image: url("../images/paypal.png");
+      }
+
+      .venmo {
+        background-image: url("../images/venmo.png");
+      }
+
+      .row-payment input[type="radio"]:active + .drinkcard-cc {
+        opacity: 0.9;
+      }
+      .row-payment input[type="radio"]:checked + .drinkcard-cc {
+        -webkit-filter: none;
+        -moz-filter: none;
+        filter: none;
+      }
+
+      .drinkcard-cc {
+        cursor: pointer;
+        background-size: contain;
+        background-repeat: no-repeat;
+        display: inline-block;
+        width: 100px;
+        height: 30px;
+        -webkit-transition: all 100ms ease-in;
+        -moz-transition: all 100ms ease-in;
+        transition: all 100ms ease-in;
+        -webkit-filter: brightness(1.8) grayscale(1) opacity(0.7);
+        -moz-filter: brightness(1.8) grayscale(1) opacity(0.7);
+        filter: brightness(1.8) grayscale(1) opacity(0.7);
+      }
+      .drinkcard-cc:hover {
+        -webkit-filter: brightness(1.2) grayscale(0.5) opacity(0.9);
+        -moz-filter: brightness(1.2) grayscale(0.5) opacity(0.9);
+        filter: brightness(1.2) grayscale(0.5) opacity(0.9);
+      }
     </style>
 
     <script>
@@ -187,25 +242,80 @@
 
         iframe.style.height = "580px";
 
-        var iframeId = iframe.id;
-        var iframeClass = iframe.className;
-
-        console.log("iFrame ID:", iframeId);
-        console.log("iFrame Class:", iframeClass);
-
         // Redirect to shifty4_popup.html
         var total = document.getElementById("totalValue").innerText;
         console.log("total===", total);
-        var url = "shifty4_popup.html?total=" + total;
+        var url = "payment.html?total=" + total;
         window.location.href = url;
       }
 
       function closePopup() {
         window.parent.document.querySelector("#shopping_cart").remove();
       }
+
+      function createPaypalButtons(amount = 10) {
+        $("#paypal-button-container").html("");
+        paypal
+          .Buttons({
+            style: {
+              layout: "horizontal", // Set the button layout (vertical, horizontal, responsive)
+              color: "blue", // Set the button color (gold, blue, silver, white, black)
+              shape: "pill", // Set the button shape (pill, rect)
+              label: "buynow", // Set the button label (checkout, pay, buynow, paypal, credit)
+              height: 40, // Set the button height in pixels
+              tagline: false,
+            },
+            createOrder: function (data, actions) {
+              // Set up the transaction details
+              return actions.order.create({
+                purchase_units: [
+                  {
+                    amount: {
+                      value: amount.toFixed(2), // Set the payment amount
+                    },
+                  },
+                ],
+              });
+            },
+            onApprove: function (data, actions) {
+              console.log("onApprove");
+              // Capture the payment when the user approves the transaction
+              return actions.order.capture().then(function (details) {
+                // Handle the successful payment
+                toastM();
+                console.log("Payment completed:", details);
+              });
+            },
+            onError: function (err) {
+              // Handle errors
+              console.error("Payment error:", err);
+            },
+          })
+          .render("#paypal-button-container");
+      }
+
+      $(document).ready(function () {
+        $("input[name=payment]").change((e) => {
+          const kindPayment = $("input[name=payment]:checked").val();
+          if (kindPayment == "paypal") {
+            $("#paypal-button-container").show();
+            $("#shift4_buynow").hide();
+            $("#shift4_buynow").removeAttr("disabled");
+          } else if (kindPayment == "creditcard") {
+            $("#paypal-button-container").hide();
+            $("#shift4_buynow").show();
+            $("#shift4_buynow").removeAttr("disabled");
+          } else if (kindPayment == "venmo") {
+            $("#paypal-button-container").hide();
+            $("#shift4_buynow").show();
+            $("#shift4_buynow").attr("disabled", true);
+          }
+        });
+        createPaypalButtons();
+      });
     </script>
   </head>
-  <body>
+  <body style="overflow: hidden">
     <div class="container">
       <div><input type="button" value="X" onclick="closePopup()" /></div>
       <h2>Shopping Cart</h2>
@@ -223,7 +333,7 @@
             <td>10</td>
             <td>
               <label class="switch">
-                <input type="checkbox" />
+                <input type="checkbox" onchange="onItemChange(event,10)" />
                 <span class="slider"></span>
               </label>
             </td>
@@ -233,7 +343,7 @@
             <td>20</td>
             <td>
               <label class="switch">
-                <input type="checkbox" />
+                <input type="checkbox" onchange="onItemChange(event,20)" />
                 <span class="slider"></span>
               </label>
             </td>
@@ -243,7 +353,7 @@
             <td>30</td>
             <td>
               <label class="switch">
-                <input type="checkbox" />
+                <input type="checkbox" onchange="onItemChange(event,30)" />
                 <span class="slider"></span>
               </label>
             </td>
@@ -252,10 +362,27 @@
             <td>Total</td>
             <td colspan="2" id="totalValue">60</td>
           </tr>
+          <tr class="row-payment">
+            <td>
+              <input checked="checked" id="r_creditcard" type="radio" name="payment" value="creditcard" />
+              <label class="drinkcard-cc creditcard" for="r_creditcard"></label>
+            </td>
+            <td>
+              <input id="r_paypal" type="radio" name="payment" value="paypal" />
+              <label class="drinkcard-cc paypal" for="r_paypal"></label>
+            </td>
+            <td>
+              <input id="r_venmo" type="radio" name="payment" value="venmo" />
+              <label class="drinkcard-cc venmo" for="r_venmo"></label>
+            </td>
+          </tr>
           <tr class="row-visible">
             <td colspan="3">
-              <div class="form-group">
-                <input type="button" value="Buy Now" onclick="navigateToShift4Charge()" />
+              <div class="form-group" style="margin: 0">
+                <div style="width: fit-content; margin: auto">
+                  <input id="shift4_buynow" type="button" value="Buy Now" onclick="navigateToShift4Charge()" style="float: unset" />
+                </div>
+                <div id="paypal-button-container" style="display: none; width: fit-content; margin: auto"></div>
               </div>
             </td>
           </tr>
@@ -263,14 +390,12 @@
       </table>
     </div>
     <script>
-      const iframe = window.parent.document.querySelector('#shopping_cart');
+      const iframe = window.parent.document.querySelector("#shopping_cart");
       var cardsSelected = {};
       var xpos = 0;
       $(document).ready(updateTable);
 
       window.addEventListener("message", (evt) => {
-        console.log("shopping_cart : message", evt.data);
-
         if (evt.data.message == "select-card") {
           if (!cardsSelected[evt.data.card.id]) {
             cardsSelected[evt.data.card.id] = evt.data.card._cardData;
@@ -278,28 +403,20 @@
             delete cardsSelected[evt.data.card.id];
           }
           updateTable();
-        }  else if(evt.data.message == "moveWindow"){
+        } else if (evt.data.message == "moveWindow") {
           moveWindow();
         }
       });
 
-      // const channel = new BroadcastChannel("example-channel");
-      // channel.addEventListener("message", (evt) => {
-      //   if(evt.data.message == "current-xpos"){
-      //     xpos = evt.data.xpos;
-      //   }
-      // });
-
-      function moveWindow(){
-        iframe.style.left = (Math.min(window.parent.innerWidth - 400, Math.max(20, window.parent.xpos - 200))) + "px";
+      function moveWindow() {
+        iframe.style.left = Math.min(window.parent.innerWidth - 400, Math.max(20, window.parent.xpos - 200)) + "px";
       }
-
 
       function updateTable() {
         const cardCount = Object.keys(cardsSelected).length;
-        iframe.style.height = 235 + 66 * cardCount + "px";
+        iframe.style.height = 300 + 66 * cardCount + "px";
 
-        $(`#tblCards tbody tr:not(.row-visible)`).remove();
+        $(`#tblCards tbody tr:not(.row-visible,.row-payment)`).remove();
 
         let total = 0;
         let str = Object.values(cardsSelected).reduce((acc, cur) => {
@@ -324,8 +441,13 @@
         price = Number(price);
         const total = Number($("#totalValue").text());
         const dom = e.target || e.currentTarget;
-        $("#totalValue").html(total + (dom.checked ? 1 : -1) * price);
+        const newPrice = total + (dom.checked ? 1 : -1) * price;
+        $("#totalValue").html(newPrice);
+
+        createPaypalButtons(newPrice);
       }
+
     </script>
+    <div id="toast">Paypal Charge Success!</div>
   </body>
 </html>
