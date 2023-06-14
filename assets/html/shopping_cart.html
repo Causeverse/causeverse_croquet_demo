@@ -311,7 +311,7 @@
             $("#shift4_buynow").attr("disabled", true);
           }
         });
-        createPaypalButtons();
+        createPaypalButtons(0);
       });
     </script>
   </head>
@@ -435,6 +435,7 @@
         }, "");
         $("#totalValue").html(total);
         $(`.row-visible:first`).before(str);
+        createPaypalButtons(total);
       }
 
       function onItemChange(e, price) {
