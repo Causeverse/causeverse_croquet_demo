@@ -57,8 +57,10 @@ export function init(Constants) {
     },
     {
       card: {
-        translation: [50, 0.3, -20],
-        scale: [8, 8, 8],
+        // updated UI
+        translation: [-2.893156621082443, 0.7617183867697175, -40.28980153633935],
+        scale: [4.044857213103242, 4.044857213103242, 4.044857213103242],
+        rotation: [0, 0.7060613635388776, 0, 0.7081506555229763],
         type: "2d",
         textureType: "image",
         textureLocation: "./assets/images/Image_2.jpg",
@@ -73,9 +75,9 @@ export function init(Constants) {
     },
     {
       card: {
-        translation: [20, 0, -60],
-        scale: [2, 2, 2],
-        rotation: [0, (-Math.PI / 2) * 3, 0],
+        translation: [-3.223931177916578, 0.7323632464811168, -62.61002038612586],
+        scale: [4.081474444355181, 4.081474444355181, 4.081474444355181],
+        rotation: [0, -0.7071067811865476, 0, -0.7071067811865475],
         type: "2d",
         textureType: "image",
         textureLocation: "./assets/images/Image_10.jpg",
@@ -88,9 +90,9 @@ export function init(Constants) {
     },
     {
       card: {
-        translation: [40, 1, -45],
-        scale: [8, 8, 8],
-        // rotation: [0, -Math.PI / 2, 0],
+        translation: [0.9722996053665667, 1.0747901595001719, -20.479155246471258],
+        scale: [3.1824159137293933, 3.1824159137293933, 3.1824159137293933],
+        rotation: [0, 1.0016035377506327, 0.0040876230226333105, 0],
         type: "2d",
         textureType: "image",
         textureLocation: "./assets/images/Image_5.jpg",
@@ -105,9 +107,9 @@ export function init(Constants) {
     },
     {
       card: {
-        translation: [25, 1, -45],
-        scale: [8, 8, 8],
-        rotation: [0, 0.2, 0],
+        translation: [-3.2335253418547576, 0.8296940527559207, -51.64738647038198],
+        scale: [4.467167422092182, 4.467167422092182, 4.467167422092182],
+        rotation: [0, -0.7121959868394556, 0, 0.71],
         type: "2d",
         textureType: "image",
         textureLocation: "./assets/images/Image_7.jpg",
