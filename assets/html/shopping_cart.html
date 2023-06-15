@@ -3,6 +3,7 @@
   <head>
     <title>Shopping Cart</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
@@ -85,7 +86,10 @@
           <tr class="row-visible">
             <td colspan="3">
               <div class="form-group">
-                <input class="material-ripple" type="button" value="Buy Now" onclick="navigateToShift4Charge()" />
+                <button type="button" onclick="navigateToShift4Charge()">
+                  <i class="fas fa-credit-card"> </i>
+                  Buy Now
+                </button>
               </div>
             </td>
           </tr>
@@ -94,13 +98,15 @@
     </div>
     <script>
       const iframe = window.parent.document.querySelector("#shopping_cart");
-      var cardsSelected = {};
+      console.log("shopping_cart.html : cards : ", window.parent.cardsSelected);
+      if (!window.parent.cardsSelected) window.parent.cardsSelected = {};
+      var cardsSelected = window.parent.cardsSelected;
+      
       var xpos = 0;
       const CURRENCY = "$";
       $(document).ready(updateTable);
 
       window.addEventListener("message", (evt) => {
-        console.log("shopping_cart : message", evt.data);
 
         if (evt.data.message == "select-card") {
           if (!cardsSelected[evt.data.card.id]) {
@@ -127,6 +133,7 @@
       }
 
       function updateTable() {
+        console.log("updateTable Function is called : ", cardsSelected);
         const cardCount = Object.keys(cardsSelected).length;
         iframe.style.height = 235 + 73 * cardCount + "px";
 
