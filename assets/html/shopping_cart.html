@@ -5,7 +5,8 @@
     <!--TODO : Replace client ID-->
     <script src="https://www.paypal.com/sdk/js?client-id=AXQqUwacqb5esrKllRvQOZucAfYyVHdKMKwrT6qx0fIH9WN0abLD_jan5-ptZ3mMv0gCwsS9nE4E5wh5&currency=USD"></script>
     <title>Shopping Cart</title>
-	    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
 	 <link rel="stylesheet" href="../css/shifty4_popup.css" />
@@ -164,7 +165,10 @@
             <td colspan="3">
               <div class="form-group" style="margin: 0">
                 <div style="width: fit-content; margin: auto">
-                  <input id="shift4_buynow" type="button" value="Buy Now" onclick="navigateToShift4Charge()" style="float: unset" />
+                  <button id="shift4_buynow" type="button" onclick="navigateToShift4Charge()">
+                  <i class="fas fa-credit-card"> </i>
+                  Buy Now
+                </button>
                 </div>
                 <div id="paypal-button-container" style="display: none; width: fit-content; margin: auto"></div>
               </div>
@@ -176,6 +180,8 @@
     <script>
       const iframe = window.parent.document.querySelector("#shopping_cart");
       var cardsSelected = {};
+      if (!window.parent.cardsSelected) window.parent.cardsSelected = {};
+      var cardsSelected = window.parent.cardsSelected;
       var xpos = 0;
       const CURRENCY = "$";
       $(document).ready(updateTable);

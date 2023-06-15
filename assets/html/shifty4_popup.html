@@ -3,6 +3,7 @@
   <head>
     <title>Shifty4 Credit Card Form</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../css/shifty4_popup.css" />
@@ -14,7 +15,6 @@
       var totalValue = 0;
       var currency_symbol = "$";
       var currency = "USD";
-
 
       function getParameterValue(parameterName) {
         var urlParams = new URLSearchParams(window.location.search);
@@ -32,7 +32,7 @@
 
         if (amountDiv) {
           amountDiv.innerHTML = total;
-          $('#card-info').submit(() => {return validateForm()})
+          $('#btnPay').removeAttr('disabled')
         } else {
           console.error("Element with ID 'amount' not found.");
         }
@@ -65,7 +65,6 @@
         const validCVV = validateCVV();
 
         if (validAmount && validCardNumber && validCardholderName && validExpiryDate && validCVV) {
-          
           const cardNumber = document.getElementById("card-number").value.trim();
           const cardExpire = document.getElementById("expiry-date").value.trim();
           const expMonth = cardExpire.substring(0, cardExpire.indexOf("/"));
@@ -106,7 +105,10 @@
                 .then((res) => {
                   stopLoading();
                   bResult = res.data.result;
-                  if (bResult) toastM();
+                  if (bResult) {
+                    $('#btnPay').attr('disabled', 'true');
+                    toastM();
+                  }
                 });
             })
             .catch((err) => {
@@ -251,6 +253,10 @@
       function closePopup() {
         window.parent.document.querySelector("#shopping_cart").remove();
       }
+
+      function navigateShoppingCart() {
+        window.location.href = "shopping_cart.html";
+      }
     </script>
   </head>
   <body>
@@ -284,8 +290,19 @@
           <input type="text" value="424" id="cvv" name="cvv" placeholder="Enter CVV" onblur="validateCVV()" required />
           <div class="error-message"></div>
         </div>
-        <div class="form-group">
-          <input type="submit" value="Submit" />
+        <div class="form-group" style="display: flex">
+          <div style="flex: 50%">
+            <button onclick="navigateShoppingCart()">
+              <i class="fas fa-arrow-left"> </i>
+              Back
+            </button>
+          </div>
+          <div class="form-group" style="float:right">
+            <button id="btnPay" type="submit" onclick="validateForm()" disabled>
+              <i class="fas fa-credit-card"> </i>
+              Pay Now
+            </button>
+          </div>
         </div>
       </form>
       <div id="toast">Shift4 Charge Success!</div>
@@ -308,6 +325,9 @@
       ></div>
     </div>
     <script>
+      $('#card-info').submit(e => {
+        e.preventDefault()
+      })
       function startLoading() {
         $(window.parent.document.body).css("pointer-events", "none");
         $("#loader").show();

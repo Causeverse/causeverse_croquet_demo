@@ -6,9 +6,10 @@ body {
   height: 100vh;
   background: none;
   overflow: hidden;
+  user-select: none;
 }
 * {
-  font-family: "Kanit", sans-serif !important;
+  font-family: "Kanit", sans-serif;
 }
 
 .container {
@@ -28,7 +29,8 @@ table td {
 table td img,
 .tframe,
 .form-group input[type="button"],
-.form-group input[type="submit"] {
+.form-group input[type="submit"],
+.form-group button {
   border: 2.5px solid white;
   box-shadow: 0 0 0.5rem rgba(0, 0, 255, 0.55);
   border-radius: 0.4rem;
@@ -93,14 +95,6 @@ table td img,
 
 .form-group input[type="button"]:hover {
   background-color: #45a049;
-}
-
-.form-group input[type="button"]:disabled {
-  background-color: #ccc;
-  pointer-events: none;
-  border: unset;
-  box-shadow: unset;
-  border-radius: 0.4rem;
 }
 
 table {
@@ -214,7 +208,8 @@ input:checked + .slider:before {
   font-weight: bold;
 }
 
-.form-group input[type="submit"] {
+.form-group input[type="submit"],
+.form-group button {
   width: auto;
   padding: 10px 20px;
   border: none;
@@ -225,7 +220,8 @@ input:checked + .slider:before {
   font-size: 16px;
 }
 
-.form-group input[type="submit"]:hover {
+.form-group input[type="submit"]:hover,
+.form-group button:hover {
   background-color: #45a049;
 }
 
@@ -326,3 +322,14 @@ input:checked + .slider:before {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
 } */
+
+
+
+.form-group input[type="button"]:disabled,
+.form-group button:disabled {
+  background-color: #ccc!important;
+  pointer-events: none!important;
+  border: unset;
+  box-shadow: unset;
+  border-radius: 0.4rem;
+}
