@@ -132,5 +132,46 @@ export function init(Constants) {
         spawn: "default",
       },
     },
+
+    {
+      card:{
+        translation: [4.633418784852404, 1.5554655647456497, -57.456539293838844],
+        scale: [2.753870803984162, 2.753870803984162, 2.753870803984162],
+        rotation: [-0.0012263821518347603, 0.7056527846502783, -0.005350085267201436, -0.7085365340543561],
+        layers: ["pointer"],
+        name: "/placard_1.png_1",
+        cornerRadius: 0.02,
+        fileName: "/placard_1.png",
+        fullBright: true,
+        modelType: "img",
+        shadow: true,
+        singleSided: true,
+        textureLocation: "./assets/images/placard_1.png",
+        textureType: "image",
+        type: "2d",
+    
+      }
+    },
+
+    {
+      card:{
+        translation: [4.633418784852404, 1.5554655647456497, -40.456539293838844],
+        scale: [2.753870803984162, 2.753870803984162, 2.753870803984162],
+        rotation: [-0.0012263821518347603, 0.7056527846502783, -0.005350085267201436, -0.7085365340543561],
+        layers: ["pointer"],
+        name: "/placard_1.png_2",
+        cornerRadius: 0.02,
+        fileName: "/placard_1.png",
+        fullBright: true,
+        modelType: "img",
+        shadow: true,
+        singleSided: true,
+        textureLocation: "./assets/images/placard_1.png",
+        textureType: "image",
+        type: "2d",
+    
+    
+      }
+    },
   ];
 }
