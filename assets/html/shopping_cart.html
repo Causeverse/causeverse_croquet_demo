@@ -6,11 +6,14 @@
     <script src="https://www.paypal.com/sdk/js?client-id=AdnJC-bXvnACEWQY_IGTal_bla955y3V8kSNM_gZKCjweWmo6Gt5f6pGwyH_RYQA7TtaCmo8mfUfs5tt&currency=USD&enable-funding=venmo"></script>
     <title>Shopping Cart</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet" />
-	 <link rel="stylesheet" href="../css/shifty4_popup.css" />
+    <link rel="stylesheet" href="../css/shifty4_popup.css" />
 
+    <script src="https://js.braintreegateway.com/web/3.94.0/js/client.min.js"></script>
+    <script src="https://js.braintreegateway.com/web/3.94.0/js/venmo.min.js"></script>
+    <script src="https://js.braintreegateway.com/web/3.94.0/js/data-collector.min.js"></script>
 
     <script>
       function toastM() {
@@ -28,7 +31,7 @@
 
         // Redirect to shifty4_popup.html
         var total = document.getElementById("totalValue").innerText;
-        
+
         var url = "shifty4_popup.html?total=" + total;
         window.location.href = url;
       }
@@ -84,15 +87,15 @@
           if (kindPayment == "paypal") {
             $("#paypal-button-container").show();
             $("#shift4_buynow").hide();
-            $("#shift4_buynow").removeAttr("disabled");
+            $("#venmo_buynow").hide();
           } else if (kindPayment == "creditcard") {
             $("#paypal-button-container").hide();
             $("#shift4_buynow").show();
-            $("#shift4_buynow").removeAttr("disabled");
+            $("#venmo_buynow").hide();
           } else if (kindPayment == "venmo") {
             $("#paypal-button-container").hide();
-            $("#shift4_buynow").show();
-            $("#shift4_buynow").attr("disabled", true);
+            $("#shift4_buynow").hide();
+            $("#venmo_buynow").show();
           }
         });
         createPaypalButtons(0);
@@ -144,7 +147,7 @@
           </tr>
           <tr class="row-visible" style="font-weight: bolder">
             <td>Total</td>
-                        <td id="totalValue">60</td>
+            <td id="totalValue">60</td>
             <td></td>
           </tr>
           <tr class="row-payment">
@@ -166,9 +169,13 @@
               <div class="form-group" style="margin: 0">
                 <div style="width: fit-content; margin: auto">
                   <button id="shift4_buynow" type="button" onclick="navigateToShift4Charge()">
-                  <i class="fas fa-credit-card"> </i>
-                  Buy Now
-                </button>
+                    <i class="fas fa-credit-card"> </i>
+                    Buy Now
+                  </button>
+                  <button id="venmo_buynow" type="button" style="display: none">
+                    <i class="fas fa-credit-card"> </i>
+                    Venmo
+                  </button>
                 </div>
                 <div id="paypal-button-container" style="display: none; width: fit-content; margin: auto"></div>
               </div>
@@ -201,7 +208,6 @@
 
       function moveWindow() {
         $(iframe).animate({ left: Math.min(window.parent.innerWidth - 400, Math.max(20, window.parent.xpos - 200)) + "px" }, 200);
-        
       }
 
       function updateTable() {
@@ -230,18 +236,154 @@
         createPaypalButtons(total);
       }
 
-      function onItemChange(e, price) {
+      function getTotalValue() {
         let totalstr = $("#totalValue").text();
         totalstr = totalstr.substring(0, totalstr.length - 1);
-        let total = Number(totalstr);
+        return Number(totalstr);
+      }
+
+      function onItemChange(e, price) {
+        let total = getTotalValue();
         const dom = e.target || e.currentTarget;
         total = total + (dom.checked ? 1 : -1) * Number(price);
         $("#totalValue").html(total.toFixed(2) + CURRENCY);
 
         createPaypalButtons(total);
       }
-
     </script>
-    <div id="toast">Paypal Charge Success!</div>
+    <script>
+      const CLIENT_AUTHORIZATION = "sandbox_rzzrjy92_zp7jk6c28kjrdt3b";
+
+      var venmoButton = document.getElementById("venmo_buynow");
+
+      braintree.client.create(
+        {
+          authorization: CLIENT_AUTHORIZATION,
+        },
+        function (clientErr, clientInstance) {
+          // Stop if there was a problem creating the client.
+          // This could happen if there is a network error or if the authorization
+          // is invalid.
+          if (clientErr) {
+            console.error("Error creating client:", clientErr);
+            return;
+          }
+
+          braintree.dataCollector.create(
+            {
+              client: clientInstance,
+              paypal: true,
+            },
+            function (dataCollectorErr, dataCollectorInstance) {
+              if (dataCollectorErr) {
+                // Handle error in creation of data collector.
+                return;
+              }
+
+              // At this point, you should access the deviceData value and provide it
+              // to your server, e.g. by injecting it into your form as a hidden input.
+              console.log("Got device data:", dataCollectorInstance.deviceData);
+            }
+          );
+
+          braintree.venmo.create(
+            {
+              client: clientInstance,
+              allowDesktop: true,
+              paymentMethodUsage: "multi_use", // available in v3.77.0+
+              // Add allowNewBrowserTab: false if your checkout page does not support
+              // relaunching in a new tab when returning from the Venmo app. This can
+              // be omitted otherwise.
+              // allowNewBrowserTab: false
+            },
+            function (venmoErr, venmoInstance) {
+              if (venmoErr) {
+                console.error("Error creating Venmo:", venmoErr);
+                return;
+              }
+
+              // Verify browser support before proceeding.
+              if (!venmoInstance.isBrowserSupported()) {
+                console.log("Browser does not support Venmo");
+                return;
+              }
+
+              displayVenmoButton(venmoInstance);
+
+              // Check if tokenization results already exist. This occurs when your
+              // checkout page is relaunched in a new tab. This step can be omitted
+              // if allowNewBrowserTab is false.
+              if (venmoInstance.hasTokenizationResult()) {
+                venmoInstance.tokenize(function (tokenizeErr, payload) {
+                  if (err) {
+                    handleVenmoError(tokenizeErr);
+                  } else {
+                    handleVenmoSuccess(payload);
+                  }
+                });
+                return;
+              }
+            }
+          );
+        }
+      );
+
+      function displayVenmoButton(venmoInstance) {
+        // Assumes that venmoButton is initially display: none.
+        // venmoButton.style.display = 'block';
+
+        venmoButton.addEventListener("click", function () {
+          venmoButton.disabled = true;
+
+          venmoInstance.tokenize(function (tokenizeErr, payload) {
+            venmoButton.removeAttribute("disabled");
+
+            if (tokenizeErr) {
+              handleVenmoError(tokenizeErr);
+            } else {
+              handleVenmoSuccess(payload);
+            }
+          });
+        });
+      }
+
+      function handleVenmoError(err) {
+        if (err.code === "VENMO_CANCELED") {
+          console.log("App is not available or user aborted payment flow");
+        } else if (err.code === "VENMO_APP_CANCELED") {
+          console.log("User canceled payment flow");
+        } else {
+          console.error("An error occurred:", err.message);
+        }
+      }
+
+      function handleVenmoSuccess(payload) {
+        // Send the payment method nonce to your server, e.g. by injecting
+        // it into your form as a hidden input.
+        console.log("Got a payment method nonce:", payload.nonce);
+        // Display the Venmo username in your checkout UI.
+        console.log("Venmo user:", payload.details.username);
+
+        const BACKEND_URL = "https://api.8base.com/clirdmoaa000d08l28ill17m9/webhook/checkout";
+        axios.post(BACKEND_URL, { paymentMethodNonce: payload.nonce, amount: getTotalValue().toFixed(2) }).then(function (result) {
+          console.log(result.data);
+
+          if (result.data.success) {
+            console.log("Your Hosted Fields form is working!");
+            toastM();
+            $('#shift4_buynow').attr('disabled', 'true');
+            $('#venmo_buynow').attr('disabled', 'true');
+            $('#paypal-button-container').attr('disabled', 'true');
+            // $('#checkout-message').html('<h1>Success</h1><p>Your Hosted Fields form is working! Check your <a href="https://sandbox.braintreegateway.com/login">sandbox Control Panel</a> for your test transactions.</p><p>Refresh to try another transaction.</p>');
+          } else {
+            console.log("Check your console.");
+            // $('#checkout-message').html('<h1>Error</h1><p>Check your console.</p>');
+          }
+        });
+
+        
+      }
+    </script>
+    <div id="toast">Charge Success!</div>
   </body>
 </html>
