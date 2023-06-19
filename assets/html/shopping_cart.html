@@ -170,11 +170,11 @@
                 <div style="width: fit-content; margin: auto">
                   <button id="shift4_buynow" type="button" onclick="navigateToShift4Charge()">
                     <i class="fas fa-credit-card"> </i>
-                    Buy Now
+                    Donate Now
                   </button>
                   <button id="venmo_buynow" type="button" style="display: none">
                     <i class="fas fa-credit-card"> </i>
-                    Venmo
+                    Donate Now
                   </button>
                 </div>
                 <div id="paypal-button-container" style="display: none; width: fit-content; margin: auto"></div>
@@ -221,7 +221,7 @@
           total += Number(cur.price);
           let strItem = `<tr>
                           <td><img src="${cur.textureLocation.replace("./assets/", "../")}" style="width: 50px; height: 50px;"/></td>
-                          <td>${Number(cur.price).toFixed(2)}${CURRENCY}</td>
+                          <td>${CURRENCY}${Number(cur.price).toFixed(2)}</td>
                           <td>
                             <label class="switch">
                               <input type="checkbox" checked onchange="onItemChange(event,${cur.price})">
@@ -231,14 +231,14 @@
                         </tr>`;
           return acc + strItem;
         }, "");
-        $("#totalValue").html(total.toFixed(2) + CURRENCY);
+        $("#totalValue").html(CURRENCY + total.toFixed(2));
         $(`.row-visible:first`).before(str);
         createPaypalButtons(total);
       }
 
       function getTotalValue() {
         let totalstr = $("#totalValue").text();
-        totalstr = totalstr.substring(0, totalstr.length - 1);
+        totalstr = totalstr.substring(1);
         return Number(totalstr);
       }
 
@@ -246,7 +246,7 @@
         let total = getTotalValue();
         const dom = e.target || e.currentTarget;
         total = total + (dom.checked ? 1 : -1) * Number(price);
-        $("#totalValue").html(total.toFixed(2) + CURRENCY);
+        $("#totalValue").html(CURRENCY + total.toFixed(2));
 
         createPaypalButtons(total);
       }

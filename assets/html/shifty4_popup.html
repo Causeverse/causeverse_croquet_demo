@@ -24,8 +24,8 @@
       function init() {
         // Get the total value from the URL parameter
         const total = getParameterValue("total");
-        totalValue = Number(total.substring(0, total.length - 1));
-        currency_symbol = total.substring(total.length - 1);
+        totalValue = Number(total.substring(1));
+        currency_symbol = total.substring(0, 1);
 
         // Set the total value in the div
         var amountDiv = document.getElementById("amount");
