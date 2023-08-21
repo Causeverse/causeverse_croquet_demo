@@ -140,7 +140,6 @@ export function init(Constants) {
                 spawn: "default",
             }
         },
-
         {
             card: {
                 translation: [0.9225186087778239, 3.4458954704738063, -22.30778358155569],
@@ -148,16 +147,17 @@ export function init(Constants) {
                 rotation: [Math.PI, Math.PI,0],
                 layers: ["pointer"],
                 cornerRadius: 0.05,
-                depth: 0.05,
+                depth: 0.025,
                 fullBright: true,
                 shadow: true,
                 textureLocation: "",
-                textureType: "image",
+                // textureType: "image",
                 // type: "2d",
                 type: "object",
                 behaviorModules: ["HyperBeamVideo"],
                 audio: true,
                 admin: true,
+                loudSynchronously: true,
             }
         },
     ];
