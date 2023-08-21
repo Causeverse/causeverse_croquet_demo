@@ -57,79 +57,79 @@ export function init(Constants) {
                 dataType: "jpg",
             }
         },
-        {
-            card: {
-                translation: [35, 0.4, -55],
-                scale: [4, 4, 4],
-                // rotation: [0, -Math.PI / 2, 0],
-                type: "2d",
-                textureType: "image",
-                textureLocation: "./assets/images/Image_1.jpg",
-                behaviorModules: ["PopUpButton"],
-                fullBright: true,
-                cornerRadius: 0.05,
-                depth: 0.05,
-                shadow: true,
-            }
-        },
-        {
-            card: {
-                translation: [50, 0.3, -20],
-                scale: [8, 8, 8],
-                type: "2d",
-                textureType: "image",
-                textureLocation: "./assets/images/Image_2.jpg",
-                cardURL: "https://croquet.io",
-                fullBright: true,
-                cornerRadius: 0.05,
-                depth: 0.05,
-                shadow: true,
-            }
-        },
-        {
-            card: {
-                translation: [20, 0, -60],
-                scale: [2, 2, 2],
-                rotation: [0, -Math.PI/2*3, 0],
-                type: "2d",
-                textureType: "image",
-                textureLocation: "./assets/images/Image_3.png",
-                behaviorModules: ["ShoppingCart"],
-                fullBright: true,
-                cornerRadius: 0.05,
-                shadow: true,
-            }
-        },
-        {
-            card: {
-                translation: [40, 1, -45],
-                scale: [8, 8, 8],
-                // rotation: [0, -Math.PI / 2, 0],
-                type: "2d",
-                textureType: "image",
-                textureLocation: "./assets/images/Image_5.jpg",
-                cardURL: "https://croquet.io",
-                fullBright: true,
-                cornerRadius: 0.05,
-                depth: 0.05,
-                shadow: true,
-            }
-        },
-        {
-            card: {
-                translation: [25, 1, -45],
-                scale: [8, 8, 8],
-                rotation: [0, 0.2, 0],
-                type: "2d",
-                textureType: "image",
-                textureLocation: "./assets/images/Image_7.jpg",
-                behaviorModules: ["Shifty4PopUp"],
-                fullBright: true,
-                cornerRadius: 0.05,
-                depth: 0.05,
-                shadow: true,
-            }
-        },
+        // {
+        //     card: {
+        //         translation: [35, 0.4, -55],
+        //         scale: [4, 4, 4],
+        //         // rotation: [0, -Math.PI / 2, 0],
+        //         type: "2d",
+        //         textureType: "image",
+        //         textureLocation: "./assets/images/Image_1.jpg",
+        //         behaviorModules: ["PopUpButton"],
+        //         fullBright: true,
+        //         cornerRadius: 0.05,
+        //         depth: 0.05,
+        //         shadow: true,
+        //     }
+        // },
+        // {
+        //     card: {
+        //         translation: [50, 0.3, -20],
+        //         scale: [8, 8, 8],
+        //         type: "2d",
+        //         textureType: "image",
+        //         textureLocation: "./assets/images/Image_2.jpg",
+        //         cardURL: "https://croquet.io",
+        //         fullBright: true,
+        //         cornerRadius: 0.05,
+        //         depth: 0.05,
+        //         shadow: true,
+        //     }
+        // },
+        // {
+        //     card: {
+        //         translation: [20, 0, -60],
+        //         scale: [2, 2, 2],
+        //         rotation: [0, -Math.PI/2*3, 0],
+        //         type: "2d",
+        //         textureType: "image",
+        //         textureLocation: "./assets/images/Image_3.png",
+        //         behaviorModules: ["ShoppingCart"],
+        //         fullBright: true,
+        //         cornerRadius: 0.05,
+        //         shadow: true,
+        //     }
+        // },
+        // {
+        //     card: {
+        //         translation: [40, 1, -45],
+        //         scale: [8, 8, 8],
+        //         // rotation: [0, -Math.PI / 2, 0],
+        //         type: "2d",
+        //         textureType: "image",
+        //         textureLocation: "./assets/images/Image_5.jpg",
+        //         cardURL: "https://croquet.io",
+        //         fullBright: true,
+        //         cornerRadius: 0.05,
+        //         depth: 0.05,
+        //         shadow: true,
+        //     }
+        // },
+        // {
+        //     card: {
+        //         translation: [25, 1, -45],
+        //         scale: [8, 8, 8],
+        //         rotation: [0, 0.2, 0],
+        //         type: "2d",
+        //         textureType: "image",
+        //         textureLocation: "./assets/images/Image_7.jpg",
+        //         behaviorModules: ["Shifty4PopUp"],
+        //         fullBright: true,
+        //         cornerRadius: 0.05,
+        //         depth: 0.05,
+        //         shadow: true,
+        //     }
+        // },
         {
             card: {
                 name: "entrance",
@@ -138,6 +138,22 @@ export function init(Constants) {
                 translation: [21.36508815813059, 0.33434647977965404, -63.20738209364587],
                 rotation: [0, -0.9845475061933894, 0, 0.17511769770179675],
                 spawn: "default",
+            }
+        },
+
+        {
+            card: {
+                translation: [0.9225186087778239, 2.4458954704738063, -22.30778358155569],
+                scale: [8, 8, 8],
+                layers: ["pointer"],
+                cornerRadius: 0.05,
+                depth: 0.05,
+                fullBright: true,
+                shadow: true,
+                textureLocation: "",
+                textureType: "image",
+                type: "2d",
+            
             }
         },
     ];
