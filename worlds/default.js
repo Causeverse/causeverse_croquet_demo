@@ -21,7 +21,7 @@ export function init(Constants) {
 
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
-        "shoppingCart.js", "csmLights.js", "popup.js", "shifty4.js", "slides.js"
+        "shoppingCart.js", "csmLights.js", "popup.js", "shifty4.js", "slides.js", "hyperbeamVideo.js"
     ];
 
     Constants.DefaultCards = [
@@ -143,8 +143,9 @@ export function init(Constants) {
 
         {
             card: {
-                translation: [0.9225186087778239, 2.4458954704738063, -22.30778358155569],
-                scale: [8, 8, 8],
+                translation: [0.9225186087778239, 3.4458954704738063, -22.30778358155569],
+                scale: [4, 4, 4],
+                rotation: [Math.PI, Math.PI,0],
                 layers: ["pointer"],
                 cornerRadius: 0.05,
                 depth: 0.05,
@@ -152,8 +153,11 @@ export function init(Constants) {
                 shadow: true,
                 textureLocation: "",
                 textureType: "image",
-                type: "2d",
-            
+                // type: "2d",
+                type: "object",
+                behaviorModules: ["HyperBeamVideo"],
+                audio: true,
+                admin: true,
             }
         },
     ];
