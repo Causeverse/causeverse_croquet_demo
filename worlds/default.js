@@ -160,5 +160,23 @@ export function init(Constants) {
                 loudSynchronously: true,
             }
         },
+
+        {
+            card: {
+                translation: [0.9225186087778239, 3.4458954704738063, -21.944295141319913],
+                scale: [14.243065915510552, 14.243065915510552, 14.243065915510552],
+                rotation: [6.123233995736766e-17, 6.123233995736766e-17, -1, 3.749399456654644e-33],
+                layers: ["pointer"],    
+                name: "drawing3",    
+                backgroundImage: "./assets/images/chalkboard.jpg",    
+                fullBright: true,    
+                height: 2,    
+                textureHeight: 480,    
+                textureType: "canvas",    
+                textureWidth: 860,    
+                type: "2d",    
+                width: 3.5555555555555554,
+            }
+        }
     ];
 }
