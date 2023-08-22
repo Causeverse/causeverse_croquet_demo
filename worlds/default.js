@@ -156,7 +156,6 @@ export function init(Constants) {
                 type: "object",
                 behaviorModules: ["HyperBeamVideo"],
                 audio: true,
-                admin: true,
                 loudSynchronously: true,
             }
         },
