@@ -211,7 +211,7 @@ class HyperBeamVideoPawn {
 
                 <form style="flex-direction: row; flex: none;">
                     <span>code:</span>
-                    <input autofocus />
+                    <input autofocus type="password"/>
                 </form>
             </div>
         `
