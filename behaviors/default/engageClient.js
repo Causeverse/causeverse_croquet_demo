@@ -82,89 +82,33 @@ class EngageClientPawn {
 			numberOfAudioObjects: 10
 		});
 		window.engage = this.space;
-		await this.joinSoundRoom();
-		await this.joinSoundRoom();
 
 		this.room = null;
 		this.userCountSize = 0;
-
-		// this.space.on("roomConnected", (room) => {
-		// 	// const devices = await window.EngageClient.DeviceManager.getInstance().getDevices('audioinput');
-		// 	// navigator.mediaDevices.enumerateDevices().then(this.gotDevices).catch(error => error);
-		// 	// console.log(devices);
-		// 	this.room = room;
-		// 	// if (this.room.name.includes("engage-video")) {
-		// 	// 	return;
-		// 	// }
-		// 	if (this.room.name.includes("engage-voice-chat")) {
-		// 		this.updateUserCount(room.participants.size + 1);
-		// 		this.room.localParticipant.setMicrophoneEnabled(true, {echoCancellation: true});
-		// 		this.leaveButton.disabled = false;
-		// 		this.toggleMuteButton.style.display = "initial";
-		// 	}
-		// 	this.subscribeToTranslation(this.room.localParticipant.identity);
-		// 	this.subscribeToRotation(this.room.localParticipant.identity);
-		// 	if (this.room.participants.size !== 0) {
-		// 		this.room.participants.forEach((participant) => {
-		// 			this.setParticipantSubscribe(participant.identity);
-		// 		});
-		// 	}
-		// 	console.log(`Connected to room ${room.name}. Publishing microphone...`);
-		// 	this.room.on("participantConnected", (participant) => {
-		// 		// if (this.room.name.includes("engage-video")) {
-		// 		// 	return;
-		// 		// }
-		// 		this.setParticipantSubscribe(participant.identity);
-		// 		if (this.room.name.includes("engage-voice-chat")) {
-		// 			this.updateUserCount(this.userCountSize + 1);
-		// 		}
-		// 	});
-		//
-		// 	this.room.on("participantDisconnected", (participant) => {
-		// 		if (room.name.includes("engage-voice-chat")) {
-		// 			this.updateUserCount(this.userCountSize !== 1 ? this.userCountSize - 1 : "-");
-		// 		}
-		// 	});
-		//
-		// 	this.room.on("activeSpeakersChanged", (participants) => {
-		// 	});
-		// })
 	}
 
-	soundsRoomEvents() {
-		this.soundRoom.on("connected", () => {
+	roomEvents() {
+		this.room.on("connected", () => {
+			this.room.localParticipant.setMicrophoneEnabled(true, {echoCancellation: true});
+			this.updateUserCount(this.room.participants.size + 1);
 			this.leaveButton.disabled = false;
-			this.toggleMuteButton.style.display = "initial";
 
-			this.subscribeToTranslation(this.soundRoom.localParticipant.identity);
-			this.subscribeToRotation(this.soundRoom.localParticipant.identity);
-		})
-	}
+			this.subscribeToTranslation(this.room.localParticipant.identity);
+			this.subscribeToRotation(this.room.localParticipant.identity);
 
-	voiceRoomEvents() {
-		this.voiceRoom.on("connected", () => {
-			this.updateUserCount(this.voiceRoom.participants.size + 1);
-			this.voiceRoom.localParticipant.setMicrophoneEnabled(true, {echoCancellation: true});
-			this.leaveButton.disabled = false;
-			this.toggleMuteButton.style.display = "initial";
-
-			this.subscribeToTranslation(this.voiceRoom.localParticipant.identity);
-			this.subscribeToRotation(this.voiceRoom.localParticipant.identity);
-			if (this.voiceRoom.participants.size !== 0) {
-				this.voiceRoom.participants.forEach((participant) => {
+			if (this.room.participants.size !== 0) {
+				this.room.participants.forEach((participant) => {
 					this.setParticipantSubscribe(participant.identity);
 				});
 			}
-		})
+		});
 
-		this.voiceRoom.on("participantConnected", (participant) => {
+		this.room.on("participantConnected", (participant) => {
 			this.setParticipantSubscribe(participant.identity);
 			this.updateUserCount(this.userCountSize + 1);
 		});
 
-		this.voiceRoom.on("participantDisconnected", (participant) => {
-			console.log(participant);
-			this.unsubscribe(participant.identity, "translateTo", this.remoteParticipantTranslate);
+		this.room.on("participantDisconnected", (participant) => {
 			this.updateUserCount(this.userCountSize !== 1 ? this.userCountSize - 1 : "-");
 		});
 	}
@@ -182,7 +126,7 @@ class EngageClientPawn {
 		this.actor.service("PlayerManager").players.forEach(player => {
 			const [x, y, z] = player._translation;
 			if (this.player._actor.id !== player.id) {
-				const remoteParticipant = this.voiceRoom.getParticipantByIdentity(player.id);
+				const remoteParticipant = this.room.getParticipantByIdentity(player.id);
 				if (remoteParticipant) {
 					remoteParticipant.setPosition(x, y, z);
 				}
@@ -208,9 +152,8 @@ class EngageClientPawn {
 		this.space.audioListener.setRotationQuaternion(w, x, y, z);
 	}
 
-	async leaveVoiceChat () {
-		await this.voiceRoom.localParticipant.setMicrophoneEnabled(true, {echoCancellation: true});
-		this.voiceRoom.leave();
+	async leaveVoiceChat()  {
+		this.room.leave();
 		this.joinButton.style.display = "initial";
 		this.leaveButton.style.display = "none";
 		this.toggleMuteButton.style.display = "none";
@@ -219,51 +162,32 @@ class EngageClientPawn {
 		this.updateUserCount("-");
 	}
 
+	async joinVoiceChat() {
+		await this.joinRoom();
+		this.toggleMuteButton.style.display = "initial";
+		this.joinButton.style.display = "none";
+		this.leaveButton.style.display = "initial";
+	}
+
 	async toggleMute() {
-		if (this.voiceRoom.localParticipant.isMicrophoneEnabled) {
+		if (this.room.localParticipant.isMicrophoneEnabled) {
 			this.toggleMuteButton.style.background = "red";
 			this.toggleMuteButton.innerHTML = "Unmute";
-			await this.voiceRoom.localParticipant.setMicrophoneEnabled(false, {echoCancellation: true});
+			await this.room.localParticipant.setMicrophoneEnabled(false, {echoCancellation: true});
 		} else {
 			this.toggleMuteButton.style.background = "green";
 			this.toggleMuteButton.innerHTML = "Mute";
-			await this.voiceRoom.localParticipant.setMicrophoneEnabled(true, {echoCancellation: true});
+			await this.room.localParticipant.setMicrophoneEnabled(true, {echoCancellation: true});
 		}
 	}
-	async joinSoundRoom () {
-		this.space.resumeAudio();
+
+	async joinRoom() {
+		await this.space.resumeAudio();
 		const { token } = await this.getToken();
 		const url = "https://causeverse-6fxnof34.livekit.cloud/";
 
-		this.soundRoom = this.space.joinRoom(url, token);
-	}
-
-	async joinVoiceChat () {
-		this.joinButton.style.display = "none";
-		this.leaveButton.style.display = "initial";
-		this.leaveButton.disabled = true;
-		await this.space.resumeAudio();
-		const { token } = await this.getVoiceToken();
-		const url = "https://causeverse-6fxnof34.livekit.cloud/";
-
-		this.voiceRoom = this.space.joinRoom(url, token);
-		this.voiceRoomEvents();
-	}
-
-	async getVoiceToken() {
-		const participantName = this.avatar.id;
-		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token",{
-			method: "POST",
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				roomName: `engage-voice-chat-${this.sessionId}`,
-				participantName
-			})
-		});
-		return await response.json();
+		this.room = await this.space.joinRoom(url, token);
+		await this.roomEvents();
 	}
 
 	async getToken() {
@@ -275,7 +199,7 @@ class EngageClientPawn {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				roomName: `engage-sounds ${Math.floor(Math.random()*(999-100+1)+100)}${this.sessionId}`,
+				roomName: `engage-voice-chat${this.sessionId}`,
 				participantName
 			})
 		});
