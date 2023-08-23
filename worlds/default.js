@@ -19,6 +19,8 @@ export function init(Constants) {
         }
     */
 
+    Constants.ExcludedSystemBehaviorModules = ["gizmo.js", "dragAndDrop.js", "propertySheet.js", "stickyNote.js"];
+    Constants.ShowCaseSpec = {};
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
         "shoppingCart.js", "csmLights.js", "popup.js", "shifty4.js", "slides.js", "hyperbeamVideo.js",
