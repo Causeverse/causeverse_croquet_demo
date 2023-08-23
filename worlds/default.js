@@ -24,7 +24,7 @@ export function init(Constants) {
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
         "shoppingCart.js", "csmLights.js", "popup.js", "shifty4.js", "slides.js", "hyperbeamVideo.js",
-        "engageClient.js", "engageScreenShare.js",
+        "engageClient.js", "engageScreenShare.js", "engageVideo.js"
     ];
 
     Constants.DefaultCards = [
@@ -184,6 +184,15 @@ export function init(Constants) {
             card: {
                 type: "object",
                 behaviorModules: ["EngageClient"],
+            }
+        },
+        {
+            card: {
+                type: "object",
+                translation: [12.265351315946932, -0.1037339888800517, -9.135954126954582],
+                rotation: [0, -0.6175070310199406, 0, 0.7865653606922556],
+                name: "engageVideo",
+                behaviorModules: ["EngageVideo"],
             }
         },
         {

@@ -39,7 +39,11 @@ class HyperBeamVideoPawn {
             console.log("hbcontainer = ", this.hbcontainer);
         }
 
-        if (!window.Hyperbeam) {
+        const { searchParams } = new URL(window.location);
+        const hyperbeam = searchParams.has('hyperbeam'); // show hyperbeam screen
+        console.log("hyperbeam:", searchParams, hyperbeam)
+
+        if (!window.Hyperbeam&&hyperbeam) {
             await new Promise(resolve => {
                 const script = document.createElement("script")
                 script.type = "module";
@@ -61,12 +65,14 @@ class HyperBeamVideoPawn {
         this.mesh = this.createPlaneMesh(this.texture)
         this.shape.add(this.mesh)
 
-        this.hb = await Hyperbeam(this.hbcontainer, embedURL, {
-            frameCb: (frame) => {
-                this.texture.image = frame
-                this.texture.needsUpdate = true
-            }
-        })
+        if (hyperbeam) {
+            this.hb = await Hyperbeam(this.hbcontainer, embedURL, {
+                frameCb: (frame) => {
+                    this.texture.image = frame
+                    this.texture.needsUpdate = true
+                }
+            })
+        }
 
         this.setEventListeners();
 
