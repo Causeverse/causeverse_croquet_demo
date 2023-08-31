@@ -40,7 +40,8 @@ class HyperBeamVideoPawn {
         }
 
         const { searchParams } = new URL(window.location);
-        const hyperbeam = searchParams.has('hyperbeam'); // show hyperbeam screen
+        // const hyperbeam = searchParams.has('hyperbeam'); // show hyperbeam screen
+        const hyperbeam = true;
         console.log("hyperbeam:", searchParams, hyperbeam)
 
         if (!window.Hyperbeam&&hyperbeam) {
