@@ -3,7 +3,7 @@
 // info@croquet.io
 
 export function init(Constants) {
-    Constants.AvatarNames = [];
+    Constants.AvatarNames = ["newwhite"];
 
     /* Alternatively, you can specify a card spec for an avatar,
        instead of a string for the partical file name, to create your own avatar.

@@ -2,7 +2,7 @@ class HyperBeamVideoPawn {
     async setup() {
         console.log("hyperbeam setup");
 
-
+        this.allowInputPasscode = true;
         this.BeamableToken = await this.getBeamableToken();
         console.log("BeamableToken = ", this.BeamableToken);
         let hbSession = await this.getHBSession(this.BeamableToken);
@@ -171,7 +171,7 @@ class HyperBeamVideoPawn {
             const intersects = this.getPlaneIntersects()
             if (intersects.length > 0) {
 
-                if (type == "mousedown" && !document.getElementById('hyperbeam_passcode') && this.hb.admin_token==null) {
+                if (type == "mousedown" && !document.getElementById('hyperbeam_passcode') && this.allowInputPasscode) {
                     this.askPasscode().then((passcode) => {
                         console.log(passcode);
                         this.getHBSession(this.BeamableToken, passcode).then((res) => {
@@ -188,6 +188,7 @@ class HyperBeamVideoPawn {
                                 };
 
                                 this.hb.setPermissions(this.hb.userId, permissions);
+                                this.allowInputPasscode = false;
                             }
 
                         });
