@@ -87,7 +87,7 @@ class HyperBeamVideoPawn {
 
 
         function onKeyEvent(e) {
-            if (e.which == 27 && document.getElementById('hyperbeam_passcode') && this.hb.admin_token==null) {
+            if (e.which == 27 && document.getElementById('hyperbeam_passcode')) {
                 window.closePoupModal();
             }
 
@@ -171,7 +171,7 @@ class HyperBeamVideoPawn {
             const intersects = this.getPlaneIntersects()
             if (intersects.length > 0) {
 
-                if (type == "mousedown" && !document.getElementById('hyperbeam_passcode')) {
+                if (type == "mousedown" && !document.getElementById('hyperbeam_passcode') && this.hb.admin_token==null) {
                     this.askPasscode().then((passcode) => {
                         console.log(passcode);
                         this.getHBSession(this.BeamableToken, passcode).then((res) => {
