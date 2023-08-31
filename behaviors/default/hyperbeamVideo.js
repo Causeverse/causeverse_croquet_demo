@@ -2,17 +2,13 @@ class HyperBeamVideoPawn {
     async setup() {
         console.log("hyperbeam setup");
 
-        if (typeof window.top.allowAdmin === "undefined") {
-            window.top.allowAdmin = false;
-        }
 
+        this.BeamableToken = await this.getBeamableToken();
+        console.log("BeamableToken = ", this.BeamableToken);
+        let hbSession = await this.getHBSession(this.BeamableToken);
 
-
-        const BeamableToken = await this.getBeamableToken();
-        console.log("BeamableToken = ", BeamableToken);
-        let embedURL = await this.getHBSession(BeamableToken);
-
-        console.log("embedURL = ", embedURL)
+        console.log("hbSession = ", hbSession)
+        console.log("embedURL = ", hbSession.embed_url)
 
 
         this.roomWidth = 1280 / 360;
@@ -44,7 +40,7 @@ class HyperBeamVideoPawn {
         const hyperbeam = true;
         console.log("hyperbeam:", searchParams, hyperbeam)
 
-        if (!window.Hyperbeam&&hyperbeam) {
+        if (!window.Hyperbeam && hyperbeam) {
             await new Promise(resolve => {
                 const script = document.createElement("script")
                 script.type = "module";
@@ -67,7 +63,7 @@ class HyperBeamVideoPawn {
         this.shape.add(this.mesh)
 
         if (hyperbeam) {
-            this.hb = await Hyperbeam(this.hbcontainer, embedURL, {
+            this.hb = await Hyperbeam(this.hbcontainer, hbSession.embed_url, {
                 frameCb: (frame) => {
                     this.texture.image = frame
                     this.texture.needsUpdate = true
@@ -91,19 +87,18 @@ class HyperBeamVideoPawn {
 
 
         function onKeyEvent(e) {
-            if (e.which == 27 && document.getElementById('hyperbeam_passcode')) {
+            if (e.which == 27 && document.getElementById('hyperbeam_passcode') && this.hb.admin_token==null) {
                 window.closePoupModal();
             }
-            if (!window.top.allowAdmin) {
-                return false;
-            }
+
             const { activeElement } = document;
             if ((!activeElement ||
                 (activeElement.nodeName !== "INPUT" &&
                     activeElement.nodeName !== "TEXTAREA" &&
                     !activeElement.isContentEditable)) &&
                 // your custom checks go here, for example
-                (e.key === " " || e.key === "Enter")
+                (e.key === " " || e.key === "Enter") &&
+                this.hb
             ) {
                 this.hb.sendEvent({
                     type: e.type,
@@ -135,10 +130,11 @@ class HyperBeamVideoPawn {
         return (await resp.json()).access_token
     }
 
-    async getHBSession(access_token) {
+    async getHBSession(access_token, passcode = "") {
+        const SERVER_URL = "https://api.beamable.com/basic/1642198348336143.DE_1642198348336144.micro_HBSessionService";
         let payload = {};
-        payload.passCode = "blabla";
-        const resp = await fetch("https://api.beamable.com/basic/1642198348336143.DE_1642198348336145.micro_HBSessionService/GetSession", {
+        payload.passCode = passcode;
+        const resp = await fetch(SERVER_URL + "/GetSession", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -146,7 +142,7 @@ class HyperBeamVideoPawn {
                 "Authorization": "Bearer " + access_token
             }, body: JSON.stringify(payload),
         })
-        return (await resp.json()).embed_url
+        return (await resp.json())
     }
 
     getScreenPosition(ix) {
@@ -174,17 +170,33 @@ class HyperBeamVideoPawn {
         if (this.mesh && this.hb) {
             const intersects = this.getPlaneIntersects()
             if (intersects.length > 0) {
-                if (!window.top.allowAdmin) {
-                    if (type == "mousedown" && !document.getElementById('hyperbeam_passcode')) {
-                        this.askPasscode().then(() => {
-                            window.top.allowAdmin = true;
-                            console.log("correct admin");
-                        }).catch(() => {
-                            console.log("not admin");
+
+                if (type == "mousedown" && !document.getElementById('hyperbeam_passcode')) {
+                    this.askPasscode().then((passcode) => {
+                        console.log(passcode);
+                        this.getHBSession(this.BeamableToken, passcode).then((res) => {
+                            console.log("Admin Token = ", res.admin_token)
+
+                            this.hb.embedURL = res.embed_url;
+                            this.hb.adminToken = res.admin_token;
+
+                            if (res.admin_token) {
+                                const permissions = {
+                                    priority: 2, // default = 0
+                                    idle_timeout: 3000, // default = 0
+                                    control_disabled: res.admin_token == null,
+                                };
+
+                                this.hb.setPermissions(this.hb.userId, permissions);
+                            }
+
                         });
-                    }
-                    return false;
+
+                    });
+
                 }
+
+
                 const vector = new THREE.Vector3().copy(intersects[0].point)
                 this.mesh.worldToLocal(vector)
                 this.hb.sendEvent({
@@ -238,19 +250,21 @@ class HyperBeamVideoPawn {
         return new Promise((resolve, reject) => {
             form.onsubmit = async (e) => {
                 e.preventDefault()
-                const code = input.value
-                if (await this.sha256(code) === "feec62854fa4d276b9e7ca69d4f4d59c7d99017c7a0e680707f454f44cebdbcf") {
-                    span.innerText = "Success! You have become an admin"
-                    input.style.display = "none"
-                    await new Promise(resolve => setTimeout(resolve, 1000))
-                    resolve()
-                } else {
-                    span.innerText = "Fail! The code is invalid."
-                    input.style.display = "none"
-                    await new Promise(resolve => setTimeout(resolve, 1000))
-                    reject()
-                }
+                resolve(input.value)
                 div.remove()
+                // const code = input.value
+                // if (await this.sha256(code) === "feec62854fa4d276b9e7ca69d4f4d59c7d99017c7a0e680707f454f44cebdbcf") {
+                //     span.innerText = "Success! You have become an admin"
+                //     input.style.display = "none"
+                //     await new Promise(resolve => setTimeout(resolve, 1000))
+                //     resolve()
+                // } else {
+                //     span.innerText = "Fail! The code is invalid."
+                //     input.style.display = "none"
+                //     await new Promise(resolve => setTimeout(resolve, 1000))
+                //     reject()
+                // }
+
             }
         })
     }
