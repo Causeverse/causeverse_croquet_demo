@@ -1,7 +1,11 @@
 class EngageVideoPawn {
 
 	async setup() {
-		this.future(4000).getEngageClient();
+		this.avatar = this.getMyAvatar().actor;
+		this.player = this.getMyAvatar();
+		this.space = await window.engage;
+		await this.space.spatialAudioInitializedPromise;
+		await this.joinVideoRoom();
 
 		this.addEventListener("pointerTap", "startVideo");
 
@@ -9,17 +13,13 @@ class EngageVideoPawn {
 		this.placeholderMesh.position.set(...this.getScreenPosition(0));
 		this.shape.add(this.placeholderMesh);
 
-		this.avatar = this.getMyAvatar().actor;
-		this.player = this.getMyAvatar();
-
-		this.room = null;
 		this.toggleVideo = false;
 		this.videoUsers = new Map();
 	}
 
 	async handleRoomEvents() {
 		this.room.on("connected", () => {
-			if (this.room.participants && this.room.participants.size) {
+			if (this.room && this.room.participants && this.room.participants.size) {
 				this.room.participants.forEach(participant => {
 					participant.on("trackPublished", publication => {
 						this.subscribeToVideoPublication(participant.identity, publication);
@@ -194,6 +194,8 @@ class EngageVideoPawn {
 		const url = "https://causeverse-6fxnof34.livekit.cloud/";
 
 		this.room = this.space.joinRoom(url, token);
+		console.log(this.room);
+		this.handleRoomEvents();
 	}
 
 	async getToken() {

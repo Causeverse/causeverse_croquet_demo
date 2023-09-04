@@ -2,8 +2,7 @@ class EngageScreenSharePawn {
 
 	async setup() {
 		const tokenP = this.getToken()
-		await new Promise(resolve => setTimeout(resolve, 4000))
-		this.space = window.engage
+		this.space = await window.engage;
 
 		const { token } = await tokenP
 		const url = "https://causeverse-6fxnof34.livekit.cloud/";

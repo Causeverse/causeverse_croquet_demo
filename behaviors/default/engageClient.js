@@ -68,25 +68,41 @@ class EngageClientPawn {
 		this.avatar = this.getMyAvatar().actor;
 		this.player = this.getMyAvatar();
 
-		if (!window.EngageClient) {
-			await new Promise(resolve => {
+		window.engage = new Promise(resolve => {
+			if (!window.EngageClient) {
 				const script = document.createElement("script")
-				script.setAttribute("src", "lib/atmoky-engage-client.js")
-				script.onload = resolve;
+				script.setAttribute("src", "assets/src/atmoky-engage-client.js")
+				script.onload = async () => {
+					this.space = await new window.EngageClient.Space({
+						audioContext: new AudioContext(),
+						numberOfDistanceModels: 20,
+						numberOfAudioObjects: 20
+					});
+					resolve(this.space);
+				};
 				document.body.appendChild(script);
-			})
-		}
-		this.space = await new window.EngageClient.Space({
-			audioContext: new AudioContext(),
-			numberOfDistanceModels: 10,
-			numberOfAudioObjects: 10
-		});
-		window.engage = this.space;
+			} else {
+				new window.EngageClient.Space({
+					audioContext: new AudioContext(),
+					numberOfDistanceModels: 20,
+					numberOfAudioObjects: 20
+				}).then(resolve);
+			}
+		})
 
+		this.space = await window.engage;
+		await this.space.spatialAudioInitializedPromise;
+		this.joinSoundRoom();
 		this.room = null;
 		this.userCountSize = 0;
 	}
 
+	soundRoomsEvents() {
+		this.soundRoom.on("connected", () => {
+			this.subscribeToTranslation(this.soundRoom.localParticipant.identity);
+			this.subscribeToRotation(this.soundRoom.localParticipant.identity);
+		})
+	}
 	roomEvents() {
 		this.room.on("connected", () => {
 			this.room.localParticipant.setMicrophoneEnabled(true, {echoCancellation: true});
@@ -152,7 +168,7 @@ class EngageClientPawn {
 		this.space.audioListener.setRotationQuaternion(w, x, y, z);
 	}
 
-	async leaveVoiceChat()  {
+	async leaveVoiceChat() {
 		this.room.leave();
 		this.joinButton.style.display = "initial";
 		this.leaveButton.style.display = "none";
@@ -183,7 +199,7 @@ class EngageClientPawn {
 
 	async joinRoom() {
 		await this.space.resumeAudio();
-		const { token } = await this.getToken();
+		const {token} = await this.getToken();
 		const url = "https://causeverse-6fxnof34.livekit.cloud/";
 
 		this.room = await this.space.joinRoom(url, token);
@@ -192,7 +208,7 @@ class EngageClientPawn {
 
 	async getToken() {
 		const participantName = this.avatar.id;
-		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token",{
+		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token", {
 			method: "POST",
 			headers: {
 				'Accept': 'application/json',
@@ -209,6 +225,31 @@ class EngageClientPawn {
 	teardown() {
 		this.space.removeAllAudioObjects();
 		this.space.leaveAllRooms();
+	}
+
+	async joinSoundRoom() {
+		this.space.resumeAudio();
+		const { token } = await this.getSoundToken();
+		const url = "https://causeverse-6fxnof34.livekit.cloud/";
+
+		this.soundRoom = await this.space.joinRoom(url, token);
+		this.soundRoomsEvents();
+	}
+
+	async getSoundToken() {
+		const participantName = this.avatar.id;
+		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token",{
+			method: "POST",
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				roomName: `engage-sound-room-${this.sessionId}`,
+				participantName
+			})
+		});
+		return await response.json();
 	}
 }
 
