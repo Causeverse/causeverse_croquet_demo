@@ -13,6 +13,7 @@ class DiscordWidgetPawn {
         dom.innerHTML = `new Crate({
         server: '${serverId}',
         channel: '${channelId}',
+        location: [12, -80]
         })`;
         document.body.appendChild(dom);
 
