@@ -41,14 +41,14 @@
 
     z-index: 2;
     left: 50%;
-    top: 50%;
+    top: 40.5%;
     transform: translate(-50%, -50%);
 }
 
 .panel-title {
     font-size: 25px;
     text-align: center;
-    margin: 30px 0px 30px 0px;
+    margin: 15px 0px 15px 0px;
 }
 
 .cancelButton {
@@ -104,7 +104,7 @@
 }
 
 .nameField {
-    height: 24px;
+    height: 14px;
     font-size: 24px;
     color: white;
     background-color: rgba(0, 0, 0, 0.5);
@@ -704,7 +704,7 @@
 }
 
 #dialogAvatarSelections {
-    height: 100px;
+    height: 60px;
     width: 100%;
     padding-bottom: 30px;
 }
@@ -746,11 +746,10 @@
 }
 
 .avatarNameField {
-    height: 24px;
+    height: 14px;
     white-space: nowrap;
     overflow: hidden;
     padding: 12px 20px;
-    margin-bottom: 30px;
 }
 
 .content-container {
@@ -891,6 +890,20 @@
     background-color: #761cfe;
     color: white;
     font-weight: bold;
+}
+
+.mic-container {
+    display: flex;
+    justify-content: end;
+}
+
+.audio-input {
+    width: 304px;
+}
+
+.audio-volume-level {
+    margin-left: 50px;
+    width: 50px;
 }
 
 @media (max-width: 600px), (max-height: 600px) {

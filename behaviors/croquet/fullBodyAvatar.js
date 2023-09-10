@@ -1,4 +1,13 @@
-class AvatarPawn {
+// the following import statement is solely for the type checking and
+// autocompletion features in IDE.  A Behavior cannot inherit from
+// another behavior or a base class but can use the methods and
+// properties of the card to which it is installed.
+// The prototype classes ActorBehavior and PawnBehavior provide
+// the features defined at the card object.
+
+import {PawnBehavior} from "../PrototypeBehavior";
+
+class AvatarPawn extends PawnBehavior {
     setup() {
         this.speedManager = {snapshots: [], speed: 0, sign: 1, lastTime: Date.now()};
         this.teardown();
@@ -68,7 +77,7 @@ class AvatarPawn {
         this.avatarModel = this.shape.children[0];
         const group = new Microverse.THREE.Group();
         group.add( this.shape.children[0] );
-        group.rotateY(Math.PI);
+        // group.rotateY(Math.PI);
         group.translateY(-1.7);
         this.shape.add(group);
 
