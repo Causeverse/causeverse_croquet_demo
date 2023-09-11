@@ -1,6 +1,26 @@
 class EngageScreenSharePawn {
 
 	async setup() {
+
+		if (!window.engage) {
+			window.engage = new Promise((resolve, reject) => {
+				const script = document.createElement("script")
+				script.setAttribute("src", "assets/src/atmoky-engage-client.js")
+				script.onload = () => {
+					try {
+						resolve(new window.EngageClient.Space({
+							audioContext: new AudioContext(),
+							numberOfDistanceModels: 20,
+							numberOfAudioObjects: 20
+						}))
+					} catch(e) {
+						reject(e)
+					}
+				}
+				document.body.appendChild(script)
+			})
+		}
+
 		const tokenP = this.getToken()
 		this.space = await window.engage;
 
@@ -25,7 +45,6 @@ class EngageScreenSharePawn {
 
 		const geometry = new Microverse.THREE.PlaneGeometry(2*640/360, 2)
 		this.video = document.createElement("video")
-		document.body.appendChild(this.video)
 		this.texture = new Microverse.THREE.VideoTexture(this.video)
 		this.defaultMaterial = new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, color: "#0b0b0b" })
 		this.videoMaterial = new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, map: this.texture })
@@ -51,9 +70,18 @@ class EngageScreenSharePawn {
 
 	renderSharedScreen(publication, participant) {
 		this.screenShareTaken = true
-		publication.on("subscribed", track => {
-			track.attach(this.video)
+		publication.on("subscribed", async track => {
 			this.mesh.material = this.videoMaterial
+			track.attach(this.video)
+			let playing = false
+			while (!playing) {
+				try {
+					this.video.play()
+					playing = true
+				} catch (e) {
+					await new Promise(resolve => window.setTimeout(resolve, 1000))
+				}
+			}
 		})
 		publication.setSubscribed(true)
 		participant.on("trackUnpublished", publication => {
@@ -72,8 +100,10 @@ class EngageScreenSharePawn {
 			if (this.screenShareTaken) return
 			await this.authorize()
 			const publication = await this.room.localParticipant.setScreenShareEnabled(true)
+			console.log(publication)
 			publication.track.attach(this.video)
 			this.mesh.material = this.videoMaterial
+			this.video.play()
 		}
 	}
 
