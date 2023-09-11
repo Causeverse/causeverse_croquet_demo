@@ -5,6 +5,10 @@
     user-select: text;
 }
 
+#joinDialog {
+    top: 53%;
+}
+
 #dialogTitle {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;

@@ -8,6 +8,7 @@ class EngageClientPawn {
             padding: 10px;
             top: 10px;
             left: 80%;
+            display: none;
             "class="engage-chat">
             <div>
                 <button
