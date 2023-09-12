@@ -5,10 +5,6 @@
     user-select: text;
 }
 
-#joinDialog {
-    top: 53%;
-}
-
 #dialogTitle {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -45,14 +41,14 @@
 
     z-index: 2;
     left: 50%;
-    top: 40.5%;
+    top: 50%;
     transform: translate(-50%, -50%);
 }
 
 .panel-title {
     font-size: 25px;
     text-align: center;
-    margin: 15px 0px 15px 0px;
+    margin: 30px 0px 30px 0px;
 }
 
 .cancelButton {
@@ -108,7 +104,7 @@
 }
 
 .nameField {
-    height: 14px;
+    height: 24px;
     font-size: 24px;
     color: white;
     background-color: rgba(0, 0, 0, 0.5);
@@ -708,7 +704,7 @@
 }
 
 #dialogAvatarSelections {
-    height: 60px;
+    height: 100px;
     width: 100%;
     padding-bottom: 30px;
 }
@@ -750,10 +746,11 @@
 }
 
 .avatarNameField {
-    height: 14px;
+    height: 24px;
     white-space: nowrap;
     overflow: hidden;
     padding: 12px 20px;
+    margin-bottom: 30px;
 }
 
 .content-container {
@@ -894,20 +891,6 @@
     background-color: #761cfe;
     color: white;
     font-weight: bold;
-}
-
-.mic-container {
-    display: flex;
-    justify-content: end;
-}
-
-.audio-input {
-    width: 304px;
-}
-
-.audio-volume-level {
-    margin-left: 50px;
-    width: 50px;
 }
 
 @media (max-width: 600px), (max-height: 600px) {
