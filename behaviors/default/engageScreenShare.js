@@ -1,6 +1,8 @@
 class EngageScreenSharePawn {
-
 	async setup() {
+		this.SCREEN_ASPECT_RATIO = 16/9
+
+		this.cleanup()
 
 		if (!window.engage) {
 			window.engage = new Promise((resolve, reject) => {
@@ -31,52 +33,104 @@ class EngageScreenSharePawn {
 		this.room.on("connected", () => {
 			this.room.participants.forEach(participant => {
 				if (participant.isScreenShareEnabled) {
-					this.screenShareTaken = true
-					const publication = [...participant.videoTracks.values()].find(({ source }) => source === "screen_share")
-					this.renderSharedScreen(publication, participant)
+					const videoPub = [...participant.videoTracks.values()][0]
+					if (videoPub) {
+						console.log("video pub found", videoPub)
+						this.renderRemoteVideo(videoPub, participant)
+					}
+					const audioPub = [...participant.audioTracks.values()][0]
+					if (audioPub) {
+						console.log("audio pub found", audioPub)
+						this.renderRemoteAudio(audioPub, participant)
+					}
 				}
 			})
 		})
+
 		this.room.on("trackPublished", (publication, participant) => {
-			this.renderSharedScreen(publication, participant)
+			if (publication.kind === "video") {
+				this.renderRemoteVideo(publication, participant)
+			} else if (publication.kind === "audio") {
+				this.renderRemoteAudio(publication, participant)
+			}
 		})
 
 		this.addEventListener("pointerTap", "tapped");
 
-		const geometry = new Microverse.THREE.PlaneGeometry(2*640/360, 2)
+		const geometry = new Microverse.THREE.PlaneGeometry(2*this.SCREEN_ASPECT_RATIO, 2)
 		this.video = document.createElement("video")
 		this.texture = new Microverse.THREE.VideoTexture(this.video)
-		this.defaultMaterial = new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, color: "#0b0b0b" })
+		this.texture.center.set(0.5, 0.5)
+        this.texture.colorSpace = Microverse.THREE.SRGBColorSpace
+		this.defaultMaterial = new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, color: 0x0b0b0b })
 		this.videoMaterial = new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, map: this.texture })
 		this.mesh = new Microverse.THREE.Mesh(geometry, this.defaultMaterial)
 		this.shape.add(this.mesh)
 	}
 
+	cleanup() {
+		this.room?.leave()
+		this.room = null
+		this.audioObject?.delete()
+		this.audioObject = null
+		this.texture?.dispose()
+		this.texture = null
+		this.defaultMaterial?.dispose()
+		this.videoMaterial?.dispose()
+		this.defaultMaterial = this.videoMaterial = null
+		this.mesh?.removeFromParent()
+		this.mesh = null
+		this.localTrack = this.remoteTrack = null
+	}
+
 	async getToken() {
+		// TODO: currently creating a separate room for each video card, is ok?
+		const roomName = `engage-screenshare-${this.sessionId}-${this.id}`
+		console.log("room name", roomName)
 		const participantName = this.getMyAvatar().actor.id
-		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token",{
+		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token", {
 			method: "POST",
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				roomName: `engage-screen-share-${this.sessionId}`,
-				participantName
+				roomName,
+				participantName,
 			})
-		});
-		return await response.json();
+		})
+		return await response.json()
 	}
 
-	renderSharedScreen(publication, participant) {
-		this.screenShareTaken = true
+	// TODO: switch away from polling when engage provides a better mechanism
+	pollAspectRatio() {
+		// NOTE: video is clipped to fit the screen if aspect ratios don't match
+		const track = (this.localTrack || this.remoteTrack)
+		if (track) {
+			const { aspectRatio } = track.mediaStreamTrack.getSettings()
+			if (aspectRatio) {
+				const desiredRepeat =
+					aspectRatio > this.SCREEN_ASPECT_RATIO
+						? new Microverse.THREE.Vector2(this.SCREEN_ASPECT_RATIO/aspectRatio, 1)
+						: new Microverse.THREE.Vector2(1, aspectRatio/this.SCREEN_ASPECT_RATIO)
+				if (!this.texture.repeat.equals(desiredRepeat)) {
+					this.texture.repeat.copy(desiredRepeat)
+				}
+			}
+			this.future(1000).pollAspectRatio()
+		}
+	}
+
+	renderRemoteVideo(publication, participant) {
+		this.screenTaken = true
 		publication.on("subscribed", async track => {
+			this.remoteTrack = track
 			this.mesh.material = this.videoMaterial
 			track.attach(this.video)
 			let playing = false
 			while (!playing) {
 				try {
-					this.video.play()
+					await this.video.play()
 					playing = true
 				} catch (e) {
 					await new Promise(resolve => window.setTimeout(resolve, 1000))
@@ -85,30 +139,53 @@ class EngageScreenSharePawn {
 		})
 		publication.setSubscribed(true)
 		participant.on("trackUnpublished", publication => {
-			if (publication.source === "screen_share") {
-				this.screenShareTaken = false
-				this.mesh.material = this.defaultMaterial
-			}
+			this.screenTaken = false
+			this.remoteTrack = null
+			this.mesh.material = this.defaultMaterial
+		})
+		this.pollAspectRatio()
+	}
+
+	renderRemoteAudio(publication, participant) {
+		publication.on("subscribed", async track => {
+			this.audioObject = this.space.createAudioObject()
+			this.audioObject.setInput(track.audioNode)
+			// TODO: track position if moved e.g. by gizmo
+			this.audioObject.setPosition(...this.translation)
+		})
+		publication.setSubscribed(true)
+		publication.on("trackUnpublished", publication => {
+			this.audioObject.delete()
+			this.audioObject = null
 		})
 	}
 
+	// TODO: there might be a race condition when two people try to take the same screen simultaneously
 	async tapped() {
-		if (this.room.localParticipant.isScreenShareEnabled) {
+		if (this.localTrack) {
 			await this.room.localParticipant.setScreenShareEnabled(false)
+			this.room.localParticipant.unpublishTrack(this.localTrack)
+			this.localTrack = null
 			this.mesh.material = this.defaultMaterial
 		} else {
-			if (this.screenShareTaken) return
+			if (this.screenTaken) return
 			await this.authorize()
-			const publication = await this.room.localParticipant.setScreenShareEnabled(true)
-			console.log(publication)
+			if (this.screenTaken) return // NOTE: in case someone took it while you were filling the code
+			const publication = await this.room.localParticipant.setScreenShareEnabled(true, {
+				audio: true,
+			})
 			publication.track.attach(this.video)
+			this.localTrack = publication.track
 			this.mesh.material = this.videoMaterial
 			this.video.play()
+			this.pollAspectRatio()
 		}
 	}
 
 
 
+	// TODO: lmao xD
+	
     async isValidCode(code) {
         return (await this.sha256(code)) === "8d27ba37c5d810106b55f3fd6cdb35842007e88754184bfc0e6035f9bcede633"
     }
