@@ -24,7 +24,8 @@ export function init(Constants) {
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
         "shoppingCart.js", "csmLights.js", "popup.js", "shifty4.js", "slides.js", "hyperbeamVideo.js",
-        "engageClient.js", "engageScreenShare.js", "engageVideo.js", "discord.js"
+        "engageClient.js", "engageScreenShare.js", "engageVideo.js", "discord.js",
+        "engagePtPVideo.ts",
     ];
 
     Constants.DefaultCards = [
@@ -54,7 +55,7 @@ export function init(Constants) {
                 name: "light",
                 layers: ["light"],
                 type: "lighting",
-                behaviorModules: ["Light", "DiscordWidget"],
+                behaviorModules: ["Light"],
                 dataLocation: "3OF2-s4U1ZOJduGATmLEIXo1iTkQHd5ZBknKgL5SvqpQJzs7Pzx1YGApJiMqPGE6PGEsPSA-Oio7YSYgYDpgCCsZLTYjBjwOJB4sDRcrfAg3Ljk2OBoEGBYWfWAmIGEsPSA-Oio7YSImLD0gOSo9PCpgPwB9AAIIISx8YiYneScqKyQaIisNLHkaGT8YKg56JQwQfHstPiNiGQ49e2ArLjsuYCMBPgMiCQt3OQskGhcleSp9HQIIfXseHgo7EAo9CB48FRwpegsCLH4OIwY",
                 fileName: "/abandoned_parking_4k.jpg",
                 dataType: "jpg",
@@ -143,25 +144,25 @@ export function init(Constants) {
                 spawn: "default",
             }
         },
-        {
-            card: {
-                translation: [0.9225186087778239, 3.4458954704738063, -22.30778358155569],
-                scale: [4, 4, 4],
-                rotation: [Math.PI, Math.PI,0],
-                layers: ["pointer"],
-                cornerRadius: 0.05,
-                depth: 0.025,
-                fullBright: true,
-                shadow: true,
-                textureLocation: "",
-                // textureType: "image",
-                // type: "2d",
-                type: "object",
-                behaviorModules: ["HyperBeamVideo"],
-                audio: true,
-                loudSynchronously: true,
-            }
-        },
+        // {
+        //     card: {
+        //         translation: [0.9225186087778239, 3.4458954704738063, -22.30778358155569],
+        //         scale: [4, 4, 4],
+        //         rotation: [Math.PI, Math.PI,0],
+        //         layers: ["pointer"],
+        //         cornerRadius: 0.05,
+        //         depth: 0.025,
+        //         fullBright: true,
+        //         shadow: true,
+        //         textureLocation: "",
+        //         // textureType: "image",
+        //         // type: "2d",
+        //         type: "object",
+        //         behaviorModules: ["HyperBeamVideo"],
+        //         audio: true,
+        //         loudSynchronously: true,
+        //     }
+        // },
 
         {
             card: {
@@ -189,9 +190,22 @@ export function init(Constants) {
         {
             card: {
                 type: "object",
+                behaviorModules: ["EngagePtPVideo"],
+            }
+        },
+        {
+            card: {
+                type: "object",
                 translation: [12.265351315946932, -0.1037339888800517, -9.135954126954582],
                 rotation: [0, -0.6175070310199406, 0, 0.7865653606922556],
-                name: "engageVideo",
+                behaviorModules: ["EngageVideo"],
+            }
+        },
+        {
+            card: {
+                type: "object",
+                translation: [12.265351315946932, 2, -9.135954126954582],
+                rotation: [0, -0.6175070310199406, 0, 0.7865653606922556],
                 behaviorModules: ["EngageVideo"],
             }
         },

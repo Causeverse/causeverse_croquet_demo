@@ -8,7 +8,7 @@
     "watch-server": "watch-server"
   },
   "dependencies": {
-    "@croquet/microverse-library": "^0.7.10"
+    "@causeverse/microverse-library": "0.7.10-test"
   },
   "devDependencies": {
     "@croquet/microverse-file-server": "^1.0.7",

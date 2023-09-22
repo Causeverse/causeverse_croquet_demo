@@ -67,6 +67,10 @@ class EngageScreenSharePawn {
 		this.mesh = new Microverse.THREE.Mesh(geometry, this.defaultMaterial)
 		this.shape.add(this.mesh)
 	}
+	
+	teardown() {
+		this.cleanup()
+	}
 
 	cleanup() {
 		this.room?.leave()
@@ -85,7 +89,7 @@ class EngageScreenSharePawn {
 
 	async getToken() {
 		// TODO: currently creating a separate room for each video card, is ok?
-		const roomName = `engage-screenshare-${this.sessionId}-${this.id}`
+		const roomName = `engage-screenshare-${this.sessionId}-${this.actor.id}`
 		console.log("room name", roomName)
 		const participantName = this.getMyAvatar().actor.id
 		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token", {

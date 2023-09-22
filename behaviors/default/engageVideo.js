@@ -1,271 +1,218 @@
-class EngageVideoPawn {
 
+import { PawnBehavior } from "../PrototypeBehavior"
+
+class EngageVideoPawn extends PawnBehavior {
 	async setup() {
-		this.avatar = this.getMyAvatar().actor;
-		this.player = this.getMyAvatar();
-		this.space = await window.engage;
-		await this.space.spatialAudioInitializedPromise;
-		await this.joinVideoRoom();
+		this.SCREEN_ASPECT_RATIO = 16/9
 
-		this.addEventListener("pointerTap", "startVideo");
+		this.cleanup()
 
-		this.placeholderMesh = this.createPlaneMesh();
-		this.placeholderMesh.position.set(...this.getScreenPosition(0));
-		this.shape.add(this.placeholderMesh);
-
-		this.toggleVideo = false;
-		this.videoUsers = new Map();
-	}
-
-	async handleRoomEvents() {
-		this.room.on("connected", () => {
-			if (this.room && this.room.participants && this.room.participants.size) {
-				this.room.participants.forEach(participant => {
-					participant.on("trackPublished", publication => {
-						this.subscribeToVideoPublication(participant.identity, publication);
-					});
-				})
-
-				this.room.participants.forEach(participant => {
-					const publication = participant.getTrack("camera");
-					if (publication) {
-						this.subscribeToVideoPublication(participant.identity, publication);
+		if (!window.engage) {
+			window.engage = new Promise((resolve, reject) => {
+				const script = document.createElement("script")
+				script.setAttribute("src", "assets/src/atmoky-engage-client.js")
+				script.onload = () => {
+					try {
+						resolve(new window.EngageClient.Space({
+							audioContext: new AudioContext(),
+							numberOfDistanceModels: 20,
+							numberOfAudioObjects: 20
+						}))
+					} catch(e) {
+						reject(e)
 					}
-				});
-
-				this.room.participants.forEach(participant => {
-					participant.on("trackUnsubscribed", (track) => {
-						if (track.source === "camera") {
-							const user = this.videoUsers.get(track.sid);
-							track.detach(user.videoElement);
-							this.shape.remove(user.mesh);
-							this.videoUsers.delete(track.sid);
-							const element = document.getElementById(track.sid);
-							element.remove();
-							this.updateScreenPositions();
-
-							this.placeholderMesh.visible = this.videoUsers.size === 0
-						}
-					});
-				})
-			}
-		});
-
-		this.room.on("participantConnected", (participant) => {
-			participant.on("trackPublished", this.subscribeToVideoPublication.bind(this, participant.identity));
-			participant.on("trackUnsubscribed", async (track) => {
-				if (track.source === "camera") {
-					const user = this.videoUsers.get(track.sid);
-					track.detach(user.videoElement);
-					this.shape.remove(user.mesh);
-					this.videoUsers.delete(track.sid);
-					const element = document.getElementById(track.sid);
-					element.remove();
-					this.updateScreenPositions();
-					this.placeholderMesh.visible = this.videoUsers.size === 0;
 				}
-			});
-		});
-	}
-
-	async subscribeToVideoPublication(identity, publication) {
-		if (publication.source === "camera") {
-			publication.on("subscribed", (track) => {
-				const videoElement = document.createElement("video");
-				videoElement.id = publication.trackSid;
-				videoElement.style.position = "absolute";
-				videoElement.style.zIndex = "-1";
-				videoElement.style.width = "50px";
-				videoElement.style.top = "0";
-				document.body.appendChild(videoElement);
-				const texture = new Microverse.THREE.VideoTexture(videoElement);
-				const mesh = this.createPlaneMesh(texture);
-				track.attach(videoElement);
-				this.shape.add(mesh);
-				this.videoUsers.set(publication.trackSid, {
-					videoElement,
-					mesh,
-					publication,
-					texture
-				});
-				videoElement.style.left = `${50 * this.getUserIndex(publication.trackSid)}px`;
-
-				this.updateScreenPositions();
-			});
-			publication.setSubscribed(true);
+				document.body.appendChild(script)
+			})
 		}
-	};
 
-	async getEngageClient() {
-		this.space = window.engage;
-		await this.joinVideoRoom();
-		await this.handleRoomEvents();
-	}
+		const tokenP = this.getToken()
+		this.space = await window.engage;
 
-	async startVideo() {
-		if (this.toggleVideo) {
-			const publication = this.room.localParticipant.getTrack("camera");
-			this.room.localParticipant.unpublishTrack(publication.track, true);
-			const user = this.videoUsers.get(publication.trackSid);
-			this.shape.remove(user.mesh);
-			this.videoUsers.delete(publication.trackSid);
-			const videoElement = document.getElementById(publication.trackSid);
-			videoElement.remove();
-			this.updateScreenPositions();
-			this.toggleVideo = false;
-		} else {
-			if (this.keyCodePanel) {
-				return;
-			} else {
-				await this.askPasscode();
-
-			}
-			const videoElement = document.createElement("video");
-			document.body.appendChild(videoElement);
-			videoElement.style.position = "absolute";
-			videoElement.style.zIndex = "-1";
-			videoElement.style.width = "50px";
-			videoElement.style.top = "0";
-			await this.room.localParticipant.setCameraEnabled(true);
-			const publication = this.room.localParticipant.getTrack("camera");
-			videoElement.id = publication.trackSid;
-			publication.track.attach(videoElement);
-			const texture = new Microverse.THREE.VideoTexture(videoElement)
-			const mesh = this.createPlaneMesh(texture);
-			this.shape.add(mesh);
-
-			this.videoUsers.set(publication.trackSid, {
-				publication,
-				mesh,
-				texture,
-				videoElement
-			});
-			videoElement.style.left = `${50 * this.getUserIndex(publication.trackSid)}px`;
-			this.updateScreenPositions();
-			this.toggleVideo = true;
-		}
-	}
-
-	updateScreenPositions() {
-		this.videoUsers.forEach(({ mesh }, identity) => {
-			mesh.position.set(...this.getScreenPosition(this.getUserIndex(identity)))
-		})
-		this.placeholderMesh.visible = this.videoUsers.size === 0
-	}
-
-	getUserIndex(identity) {
-		const ix = [...this.videoUsers.keys()].sort().findIndex(x => x === identity)
-		if (ix === -1) throw new Error(`engage user ${identity} is not in videoUsers`)
-		return ix
-	}
-
-	initAudio() {
-		this.firstClickCb = this.onFirstClick.bind(this)
-		document.body.addEventListener("pointerdown", this.firstClickCb)
-	}
-
-	async onFirstClick() {
-		document.body.removeEventListener("pointerdown", this.firstClickCb)
-		this.firstClickCb = null
-		this.startAudio()
-	}
-	createPlaneMesh(texture) {
-		const geometry = new Microverse.THREE.PlaneGeometry(2*640/360, 2)
-		const material = texture
-			?  new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, map: texture })
-			:  new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, color: "#0b0b0b" })
-		const mesh = new Microverse.THREE.Mesh(geometry, material)
-		return mesh
-	}
-
-	getScreenPosition(ix) {
-		const level = Math.floor(ix/2)
-		const side = ix % 2
-		return [side*4, level*2.2, 0]
-	}
-
-	teardown() {
-		this.space.removeAllAudioObjects();
-		this.space.leaveAllRooms();
-	}
-
-	async joinVideoRoom () {
-		const { token } = await this.getToken();
+		const { token } = await tokenP
 		const url = "https://causeverse-6fxnof34.livekit.cloud/";
-
 		this.room = this.space.joinRoom(url, token);
-		console.log(this.room);
-		this.handleRoomEvents();
+
+		this.room.on("connected", () => {
+			this.room.participants.forEach(participant => {
+				if (participant.isCameraEnabled) {
+					const publication = [...participant.videoTracks.values()][0]
+					if (publication) {
+						this.renderRemoteVideo(publication, participant)
+					}
+				}
+			})
+		})
+
+		this.room.on("trackPublished", (publication, participant) => {
+			this.renderRemoteVideo(publication, participant)
+		})
+
+		this.addEventListener("pointerTap", "tapped");
+
+		const geometry = new Microverse.THREE.PlaneGeometry(2*this.SCREEN_ASPECT_RATIO, 2)
+		this.video = document.createElement("video")
+		this.texture = new Microverse.THREE.VideoTexture(this.video)
+		this.texture.center.set(0.5, 0.5)
+        this.texture.colorSpace = Microverse.THREE.SRGBColorSpace
+		this.defaultMaterial = new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, color: 0x0b0b0b })
+		this.videoMaterial = new Microverse.THREE.MeshBasicMaterial({ side: Microverse.THREE.DoubleSide, map: this.texture })
+		this.mesh = new Microverse.THREE.Mesh(geometry, this.defaultMaterial)
+		this.shape.add(this.mesh)
+	}
+
+	cleanup() {
+		//TODO
+		if (this.room) {
+			this.room.leave()
+		}
 	}
 
 	async getToken() {
-		const participantName = this.avatar.id;
-		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token",{
+		// TODO: currently creating a separate room for each video card, is ok?
+		const roomName = `engage-video-${this.sessionId}-${this.id}`
+		console.log("room name", roomName)
+		const participantName = this.getMyAvatar().actor.id
+		const response = await fetch("https://api.8base.com/clidfgh5000ma08mmeduqevky/webhook/engage/token", {
 			method: "POST",
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				roomName: `engage-video-${this.sessionId}`,
-				participantName
+				roomName,
+				participantName,
 			})
-		});
-		return await response.json();
+		})
+		return await response.json()
 	}
 
-	async askPasscode() {
-		this.keyCodePanel = true;
-		const div = document.createElement("div")
-		div.innerHTML = `
+	// TODO: switch away from polling when engage provides a better mechanism
+	pollAspectRatio() {
+		// NOTE: video is clipped to fit the screen if aspect ratios don't match
+		const track = (this.localTrack || this.remoteTrack)
+		if (track) {
+			const { aspectRatio } = track.mediaStreamTrack.getSettings()
+			if (aspectRatio) {
+				const desiredRepeat =
+					aspectRatio > this.SCREEN_ASPECT_RATIO
+						? new Microverse.THREE.Vector2(this.SCREEN_ASPECT_RATIO/aspectRatio, 1)
+						: new Microverse.THREE.Vector2(1, aspectRatio/this.SCREEN_ASPECT_RATIO)
+				if (!this.texture.repeat.equals(desiredRepeat)) {
+					this.texture.repeat.copy(desiredRepeat)
+				}
+			}
+			this.future(1000).pollAspectRatio()
+		}
+	}
+
+	renderRemoteVideo(publication, participant) {
+		this.screenTaken = true
+		publication.on("subscribed", async track => {
+			this.remoteTrack = track
+			this.mesh.material = this.videoMaterial
+			track.attach(this.video)
+			let playing = false
+			while (!playing) {
+				try {
+					this.video.play()
+					playing = true
+				} catch (e) {
+					await new Promise(resolve => window.setTimeout(resolve, 1000))
+				}
+			}
+		})
+		publication.setSubscribed(true)
+		participant.on("trackUnpublished", publication => {
+			this.screenTaken = false
+			this.remoteTrack = null
+			this.mesh.material = this.defaultMaterial
+		})
+		this.pollAspectRatio()
+	}
+
+	// TODO: there might be a race condition when two people try to take the same screen simultaneously
+	async tapped() {
+		if (this.localTrack) {
+			await this.room.localParticipant.setCameraEnabled(false)
+			this.room.localParticipant.unpublishTrack(this.localTrack)
+			this.localTrack = null
+			this.mesh.material = this.defaultMaterial
+		} else {
+			if (this.screenTaken) return
+			await this.authorize()
+			if (this.screenTaken) return // NOTE: in case someone took it while you were filling the code
+			const publication = await this.room.localParticipant.setCameraEnabled(true)
+			publication.track.attach(this.video)
+			this.localTrack = publication.track
+			this.mesh.material = this.videoMaterial
+			this.video.play()
+			this.pollAspectRatio()
+		}
+	}
+
+
+
+	// TODO: lmao xD
+	
+    async isValidCode(code) {
+        return (await this.sha256(code)) === "8d27ba37c5d810106b55f3fd6cdb35842007e88754184bfc0e6035f9bcede633"
+    }
+
+    async sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message)
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
+        const hashArray = Array.from(new Uint8Array(hashBuffer))
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+        return hashHex
+    }
+
+    async authorize() {
+        const saved = window.localStorage.getItem("adminCode")
+        if (await this.isValidCode(saved)) {
+            return true
+        }
+        const div = document.createElement("div")
+        div.innerHTML = `
         <div style="padding: 20px; position: absolute; z-index: 9000; left: 50%;
             top: 50%; background-color: grey; transform: translate(-50%, -50%);
             text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5); border-radius: 8px; background-color: rgba(0, 0, 0, 0.5);
             ">
             <form>
                 <span>code:</span>
-                <input autofocus />
+                <input />
             </form>
         </div>
         `
-		const events = ["click", "contextmenu", "dblclick", "mousedown", "mouseenter", "mouseleave", "mousemove",
-			"mouseover", "mouseout", "mouseup", "keydown", "keypress", "keyup", "blur", "change", "focus", "focusin",
-			"focusout", "input", "invalid", "reset", "search", "select", "submit", "drag", "dragend", "dragenter",
-			"dragleave", "dragover", "dragstart", "drop", "copy", "cut", "paste", "mousewheel", "wheel", "touchcancel",
-			"touchend", "touchmove", "touchstart"]
-		events.forEach(event => {
-			div.addEventListener(event, e => e.stopPropagation())
-		})
-		const form = div.querySelector("form")
-		const input = div.querySelector("input")
-		const span = div.querySelector("span")
-		document.body.appendChild(div)
-		return new Promise((resolve, reject) => {
-			form.onsubmit = async (e) => {
-				e.preventDefault()
-				const code = input.value
-				if (await this.sha256(code) === "8d27ba37c5d810106b55f3fd6cdb35842007e88754184bfc0e6035f9bcede633") {
-					resolve()
-					this.keyCodePanel = false;
-				} else {
-					span.innerText = "INVALID"
-					input.style.display = "none"
-					await new Promise(resolve => setTimeout(resolve, 1000))
-					reject();
-					this.keyCodePanel = false;
-				}
-				div.remove()
-			}
-		})
-	}
-
-	async sha256(message) {
-		const msgBuffer = new TextEncoder().encode(message)
-		const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
-		const hashArray = Array.from(new Uint8Array(hashBuffer))
-		const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-		return hashHex
-	}
+        const events = ["click", "contextmenu", "dblclick", "mousedown", "mouseenter", "mouseleave", "mousemove",
+            "mouseover", "mouseout", "mouseup", "keydown", "keypress", "keyup", "blur", "change", "focus", "focusin",
+            "focusout", "input", "invalid", "reset", "search", "select", "submit", "drag", "dragend", "dragenter",
+            "dragleave", "dragover", "dragstart", "drop", "copy", "cut", "paste", "mousewheel", "wheel", "touchcancel",
+            "touchend", "touchmove", "touchstart", "pointerdown", "pointerup",]
+        events.forEach(event => {
+            div.addEventListener(event, e => e.stopPropagation())
+        })
+        const form = div.querySelector("form")
+        const input = div.querySelector("input")
+        const span = div.querySelector("span")
+        document.body.appendChild(div)
+        return new Promise((resolve, reject) => {
+            form.onsubmit = async (e) => {
+                e.preventDefault()
+                const code = input.value
+                if (await this.isValidCode(code)) {
+                    window.localStorage.setItem("adminCode", code)
+                    resolve(true)
+                } else {
+                    span.innerText = "INVALID"
+                    input.style.display = "none"
+                    await new Promise(resolve => setTimeout(resolve, 1000))
+                    reject()
+                }
+                div.remove()
+            }
+        })
+    }
 }
 
 
