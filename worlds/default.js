@@ -24,7 +24,7 @@ export function init(Constants) {
     Constants.UserBehaviorDirectory = "behaviors/default";
     Constants.UserBehaviorModules = [
         "shoppingCart.js", "csmLights.js", "popup.js", "shifty4.js", "slides.js", "hyperbeamVideo.js",
-        "engageClient.js", "engageScreenShare.js", "engageVideo.js", "discord.js", "qreal.js"
+        "engageClient.js", "engageScreenShare.js", "engageVideo.js", "discord.js"/*, "qreal.js"*/
     ];
 
     Constants.DefaultCards = [
